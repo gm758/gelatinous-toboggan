@@ -16,7 +16,11 @@ import LoginOrSignup from './login_or_signup';
 import PhoneNumber from './phoneNumber';
 import Username from './username';
 import ContactsContainer from './contacts';
+import Blank from '../components/blank';
 // import NavigationBar from 'react-native-navbar';
+import { connect } from 'react-redux';
+import { isLoggedIn } from '../actions/index';
+import ip from '../config';
 
 const {
   Component,
@@ -42,6 +46,10 @@ const ROUTES = {
 };
 
 class App extends Component {
+  componentWillMount() {
+    this.props.isLoggedIn()
+  }
+
   configScene() {
     return Navigator.SceneConfigs.FloatFromRight;
   }
@@ -64,4 +72,12 @@ class App extends Component {
   }
 }
 
-export default App;
+function mapDispatchToProps(dispatch) {
+  return {
+    isLoggedIn: () => {
+      return dispatch(isLoggedIn());
+    }
+  }
+}
+
+export default connect(null, mapDispatchToProps)(App);
