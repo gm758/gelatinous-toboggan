@@ -278,11 +278,13 @@ export const video = StyleSheet.create({
     backgroundColor: colors.beige,
   },
   backgroundVideo: {
-    flex: 11,
-    marginBottom: 26,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   buttonContainer: {
-    flex: 2,
     flexDirection: 'row',
   },
   iconContainerA: {
@@ -290,6 +292,7 @@ export const video = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.eucalyptus,
+    height: 40,
     padding: 10,
     borderRadius: 100,
     marginBottom: 26,
@@ -305,6 +308,7 @@ export const video = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.auburn,
+    height: 40,
     padding: 10,
     borderRadius: 100,
     marginBottom: 26,
