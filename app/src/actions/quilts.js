@@ -1,6 +1,7 @@
 import {
   REQUEST_QUILTS,
   RECEIVE_QUILTS,
+  SELECT_WATCH_QUILT,
 } from '../constants/ActionTypes';
 import ip from '../config';
 
@@ -20,5 +21,12 @@ export function fetchQuilts(token) {
       .then(response => response.json())
       .then(data => dispatch(receiveQuilts(data)))
       .catch(error => console.error('Error in getting user\'s quilts', error));
+  };
+}
+
+export function selectWatchQuilt(data) {
+  return {
+    type: SELECT_WATCH_QUILT,
+    payload: data,
   };
 }

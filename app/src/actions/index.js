@@ -248,13 +248,6 @@ export function fetchNotifs(userId) {
   };
 }
 
-export function selectWatchQuilt(data) {
-  return {
-    type: SELECT_WATCH_QUILT,
-    payload: data,
-  };
-}
-
 export function inviteFriends(data) {
   return {
     type: INVITE_FRIENDS,

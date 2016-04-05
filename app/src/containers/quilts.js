@@ -3,8 +3,7 @@ import React, { Component } from 'react-native';
 import QuiltEntry from '../components/quilt_entry';
 import { connect } from 'react-redux';
 import Immutable from 'immutable'; // just for testing
-import { selectWatchQuilt } from '../actions/index';
-import { fetchQuilts } from '../actions/quilts';
+import { fetchQuilts, selectWatchQuilt } from '../actions/quilts';
 import { viewQuilts } from '../assets/styles';
 import NavBar from '../components/navbar';
 
