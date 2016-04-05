@@ -3,7 +3,8 @@ import React, { Component } from 'react-native';
 import QuiltEntry from '../components/quilt_entry';
 import { connect } from 'react-redux';
 import Immutable from 'immutable'; // just for testing
-import { fetchQuilts, selectWatchQuilt } from '../actions/index';
+import { selectWatchQuilt } from '../actions/index';
+import { fetchQuilts } from '../actions/quilts';
 import { viewQuilts } from '../assets/styles';
 import NavBar from '../components/navbar';
 
@@ -25,10 +26,7 @@ class ShowQuilts extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchQuilts({
-      username: this.props.username,
-      token: this.props.token,
-    });
+    this.props.fetchQuilts(this.props.token);
   }
 
   onQuiltClick(quiltId, status) {
@@ -59,7 +57,7 @@ class ShowQuilts extends Component {
       dataSource={this.getDataSource()}
       renderRow={this.onRenderRow}
     />;
-    
+
     if (this.props.quilts.get('isFetching')) {
       quiltsListView = <ActivityIndicatorIOS
         animating={true}
@@ -100,8 +98,8 @@ function mapStateToProps(state) {
 // todo: set currently watched quilt in state?
 function mapDispatchToProps(dispatch) {
   return {
-    fetchQuilts: (data) => {
-      dispatch(fetchQuilts(data));
+    fetchQuilts: (token) => {
+      dispatch(fetchQuilts(token));
     },
     selectWatchQuilt: (data) => {
       dispatch(selectWatchQuilt(data));

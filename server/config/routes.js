@@ -65,11 +65,12 @@ export default (app) => {
   });
 
   app.get('/api/quilt', requireAuth, (req, res) => {
+    const user = req.user;
     // if request query object is empty, send 404
     if (_.isEmpty(req.query)) {
       res.status(400).send('Failed to retrieve query string');
     } else {
-      controller.getAllUserQuilts(req.query.username)
+      controller.getAllUserQuilts(user)
         .then(data => res.status(200).send(data))
         .catch(error => res.status(500).send(`Failed get quilt request: ${error}`));
     }

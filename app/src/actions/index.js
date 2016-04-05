@@ -229,25 +229,6 @@ export function postFriends(userId, token, ...friendsId) {
   });
 }
 
-const requestQuilts = () => ({
-  type: REQUEST_QUILTS,
-});
-
-const receiveQuilts = (quilts) => ({
-  type: RECEIVE_QUILTS,
-  payload: quilts,
-});
-
-export function fetchQuilts(options) {
-  return (dispatch) => {
-    dispatch(requestQuilts());
-    return fetch(`http://${ip}:8000/api/quilt?username=${options.username}&token=${options.token}`)
-      .then(response => response.json())
-      .then(data => dispatch(receiveQuilts(data)))
-      .catch(error => console.error('Error in getting user\'s quilts', error));
-  };
-}
-
 const requestNotifs = () => ({
   type: REQUEST_NOTIFS,
 });
