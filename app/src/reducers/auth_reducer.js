@@ -4,21 +4,12 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
-  SET_USERNAME,
-  SET_PHONE_NUMBER,
-  RECEIVE_USER_ERROR,
-  RECEIVE_USERNAME_EXIST_ERROR,
-  RECEIVE_USERNAME_NOT_EXIST,
 } from '../constants/ActionTypes';
 
 const initialState = Map({
   isFetching: false,
   isAuthenticated: false,
-  id: null,
-  username: null,
   token: null,
-  phoneNumber: null,
-  email: null,
 });
 
 export default function (state = initialState, action) {
@@ -38,13 +29,6 @@ export default function (state = initialState, action) {
         isFetching: false,
         isAuthenticated: false,
       });
-
-
-    case SET_USERNAME:
-      return state.set('username', action.payload);
-    case SET_PHONE_NUMBER:
-      return state.set('phoneNumber', action.payload);
-      
     default:
       return state;
   }

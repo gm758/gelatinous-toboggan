@@ -18,6 +18,7 @@ import Username from './username';
 import ContactsContainer from './contacts';
 import NotifContainer from '../containers/notification';
 import Blank from './blank';
+import SignUp from './signup_container';
 import FindFriends from './find_friends';
 import { connect } from 'react-redux';
 import { isLoggedIn } from '../actions/index';
@@ -38,18 +39,18 @@ const ROUTES = {
   camera: ShowCamera,
   contacts: ContactsContainer,
   create: CreateQuilt,
+  findFriends: FindFriends,
   friends: FriendsContainer,
   home: Home,
   login: LoginContainer,
   loginOrSignup: LoginOrSignup,
+  notification: NotifContainer,
   phone: PhoneNumber,
+  selectFriends: SelectFriendsContainer,
+  signup: SignUp,
   username: Username,
   view: ShowQuilts,
   video: WatchVideo,
-  friends: FriendsContainer,
-  findFriends: FindFriends,
-  selectFriends: SelectFriendsContainer,
-  notification: NotifContainer,
 };
 
 class App extends Component {

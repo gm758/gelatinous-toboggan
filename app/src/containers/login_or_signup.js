@@ -11,33 +11,30 @@ import { crossReferenceContacts } from '../actions/index';
 class LoginOrSignupContainer extends Component {
   constructor(props) {
     super(props);
-    this.onSelect = this.onSelect.bind(this);
+    this.onLoginSelect = this.onLoginSelect.bind(this);
+    this.onSignupSelect = this.onSignupSelect.bind(this);
   }
 
+  // TODO: verify token
   componentWillReceiveProps(newProps) {
     if (newProps.token) {
       this.props.navigator.resetTo({ name: 'home' })
     }
   }
 
-  onSelect(selection) {
-    this.props.selectLoginOrSignup(selection);
+  onLoginSelect() {
     this.props.navigator.push({ name: 'login' });
+  }
+
+  onSignupSelect() {
+    this.props.navigator.push({ name: 'signup'});
   }
 
   render() {
     return (
-      <LoginOrSignup onSelect={this.onSelect} />
+      <LoginOrSignup onLoginSelect={this.onLoginSelect} onSignupSelect={this.onSignupSelect} />
     );
   }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    selectLoginOrSignup: (selection) => {
-      return dispatch(selectLoginOrSignup(selection));
-    }
-  };
 }
 
 function mapStateToProps(state) {
@@ -47,4 +44,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginOrSignupContainer);
+export default connect(mapStateToProps)(LoginOrSignupContainer);

@@ -5,6 +5,8 @@ import { login, colors } from '../assets/styles';
 import EmailInput from './email_input';
 import PasswordInput from './password_input';
 import NavBar from './navbar';
+import Validator from 'email-validator';
+import owasp from 'owasp-password-strength-test';
 import Keychain from 'react-native-keychain';
 import ip from '../config';
 import _ from 'lodash';
@@ -21,30 +23,50 @@ const CustomButton = new MKButton.Builder()
   .withStyle(login.button)
   .build();
 
-class Login extends Component {
+class SignUp extends Component {
   constructor(props) {
     super(props);
-
-    this.onPress = this.onPress.bind(this);
-    this.onBack = this.onBack.bind(this);
-    this.onTypeEmail = this.onTypeEmail.bind(this);
-    this.onTypePassword = this.onTypePassword.bind(this);
 
     this.state = {
       email: '',
       password: '',
     };
+
+    owasp.config({
+      allowPassphrases: true,
+      maxLength: 128,
+      minLength: 6,
+      minPhraseLength: 10,
+      minOptionalTestsToPass: 3,
+    });
+
+    this.onPress = this.onPress.bind(this);
+    this.onBack = this.onBack.bind(this);
+    this.onTypeEmail = this.onTypeEmail.bind(this);
+    this.onTypePassword = this.onTypePassword.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
+    console.log(this.props.token);
+
+    // TODO: move setting sign up credentials to final phase of signup
     if (newProps.isAuthenticated) {
-      this.props.navigator.replace({ name: 'home' });
+      Keychain.setInternetCredentials(ip, newProps.token, '')
+        .then(() => {
+          this.props.navigator.replace({ name: 'username' });
+        });
     }
   }
 
   onPress() {
     const emailToLowercase = this.state.email.toLowerCase();
-    this.props.loginUser(emailToLowercase, this.state.password);
+    if (!Validator.validate(this.state.email)) {
+      console.log(this.state.email, ' is invalid, please try again.');
+    } else if (!owasp.test(this.state.password)) {
+      console.log('Weak password')
+    } else {
+      this.props.signupUser(emailToLowercase, this.state.password)
+    }
   }
 
   onBack() {
@@ -62,12 +84,12 @@ class Login extends Component {
   render() {
     return (
       <View style={login.container}>
-        <NavBar onPress={this.onBack} text={'Login'} />
+        <NavBar onPress={this.onBack} text={'Sign Up'} />
         <View style={login.containerBody}>
           <EmailInput
             value={this.state.email}
             onChangeText={this.onTypeEmail}
-            placeholder={'Username or Email'}
+            placeholder={'Email Address'}
             autoFocus
           />
           <PasswordInput
@@ -76,7 +98,7 @@ class Login extends Component {
             placeholder={'Password'}
           />
           <CustomButton onPress={this.onPress}>
-            <Text style={login.buttonText}>Login</Text>
+            <Text style={login.buttonText}>Sign Up</Text>
           </CustomButton>
           <ActivityIndicatorIOS
             animating={this.props.isFetching}
@@ -90,7 +112,7 @@ class Login extends Component {
 }
 
 // todo: double check this
-Login.propTypes = {
+SignUp.propTypes = {
   navigator: PropTypes.object,
   fetchUser: PropTypes.func,
   isFetching: PropTypes.bool,
@@ -101,4 +123,4 @@ Login.propTypes = {
 };
 
 
-export default Login;
+export default SignUp;

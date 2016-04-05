@@ -8,10 +8,12 @@ const {
   StyleSheet,
   PropTypes,
 } = React;
-import { updateUser, checkUsername } from '../actions/index';
 import UsernameInput from '../components/username_input';
 import { login } from '../assets/styles';
 import { MKButton } from 'react-native-material-kit';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+import ip from '../config';
 import _ from 'lodash';
 
 const CustomButton = new MKButton.Builder()
@@ -23,51 +25,60 @@ class Username extends Component {
     super(props);
     this.onType = this.onType.bind(this);
     this.onEnter = this.onEnter.bind(this);
-    this.onCheckUsername = this.onCheckUsername.bind(this);
-    this.state = { username: '' };
+    this.checkUsername = _.debounce(this.checkUsername.bind(this), 500);
+
+    this.state = { username: '', duplicate: false };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps.duplicateUsername && nextProps.username) {
-      nextProps.navigator.replace({ name: 'phone' });
-    }
-  }
-
-  onCheckUsername(){
-    if(this.state.username){
-      const usernameToLowercase = this.state.username.toLowerCase();
-      this.props.checkUsername(this.props.userId,
-        { username: usernameToLowercase, token: this.props.token });
-    }
+  checkUsername() {
+    // TODO: revisit status codes, make more robust
+    fetch(`http://${ip}:8000/api/user/${this.state.username.toLowerCase()}`)
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({ duplicate: true });
+        } else {
+          this.setState({ duplicate: false });
+        }
+      })
+      .catch(error => console.error('error retreiving user:', error));
   }
 
   onType(username) {
     this.setState({ username });
-    const context = this;
-    _.debounce(this.onCheckUsername, 500)();
+    this.checkUsername();
   }
 
   onEnter() {
-    const usernameToLowercase = this.state.username.toLowerCase();
-    this.props.updateUser(this.props.userId, { username: usernameToLowercase, token: this.props.token });
+    if (!this.state.duplicate) {
+      const usernameToLowercase = this.state.username.toLowerCase();
+      fetch(`http://${ip}:8000/api/auth?token=${this.props.token}`, {
+        method: 'PUT',
+        body: JSON.stringify({ username: usernameToLowercase }),
+      })
+      .then(() => this.props.navigator.replace({ name: 'phone' }))
+      .catch(error => console.error('error updating user:', error));
+    }
   }
 
   render() {
-    let duplicateUsernameMessage = <Text />;
-    if (this.props.duplicateUsername && this.state.username) {
-      duplicateUsernameMessage = <Text style={styles.errorMsg}>Username already exists!</Text>;
+    let icon;
+    if (this.state.username && this.state.duplicate) {
+      icon = <Icon name="close" color="red" size={16} />
+    } else if (this.state.username) {
+      icon = <Icon name="check" color="green" size={16} />
     }
+
     return (
       <View style={login.container}>
         <View style={login.containerBody}>
-          {duplicateUsernameMessage}
           <Text>Select a Username</Text>
           <UsernameInput
-            value={this.state.username}
-            onChangeText={this.onType}
+          value={this.state.username}
+          onChangeText={this.onType}
           />
-          <CustomButton onPress={() => {if(!this.props.duplicateUsername){this.onEnter()}}}>
-            <Text style={login.buttonText}>{this.props.loginOrSignup}</Text>
+          {icon}
+          <CustomButton onPress={this.onEnter}>
+            <Text style={login.buttonText}>Continue</Text>
           </CustomButton>
         </View>
       </View>
@@ -110,23 +121,9 @@ Username.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const user = state.get('user');
-  return { userId: user.get('id'),
-           duplicateUsername: user.get('duplicateUsername'),
-           username: user.get('username'),
-           token: user.get('token'),
-        };
-}
-
-function mapDispatchToProps(dispatch) {
   return {
-    updateUser: (id, data) => {
-      dispatch(updateUser(id, data));
-    },
-    checkUsername: (id, data) => {
-      dispatch(checkUsername(id, data));
-    },
+    token: state.get('auth').get('token'),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Username);
+export default connect(mapStateToProps)(Username);

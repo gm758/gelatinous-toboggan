@@ -73,30 +73,6 @@ const receiveUsernameNotExist = () => ({
   type: RECEIVE_USERNAME_NOT_EXIST,
 });
 
-export function signupUser(email, password) {
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?email=${email}&password=${password}`, {
-      method: 'POST',
-    })
-    .then(response => response.json())
-    .then(user => dispatch(receiveUser(user)))
-    .catch(error => console.error('error', error));
-  };
-}
-
-export function loginUser(usernameOrEmail, password) {
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?usernameOrEmail=${usernameOrEmail}&password=${password}`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(user => dispatch(receiveUser(user)))
-    .catch(error => dispatch(receiveUserError()));
-  };
-}
-
 export function isLoggedIn() {
   return (dispatch) => {
     dispatch(requestUser());
@@ -104,49 +80,6 @@ export function isLoggedIn() {
       .then(credentials => dispatch(receiveUser(JSON.parse(credentials.username))))
       .catch(err => dispatch(receiveUser()));
   }
-}
-
-export function updateUser(id, data) {
-  const query = Object.assign({}, data);
-  delete query.token;
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?userId=${id}&token=${data.token}`, {
-      method: 'PUT',
-      body: JSON.stringify(query),
-    })
-    .then(user => {
-      if (user._bodyInit) {
-        console.log('user exist');
-        return dispatch(receiveUsernameExistError());
-      }
-      return dispatch(receiveUser(data));
-    })
-    .catch(error => {
-      console.error('error updating user:', error);
-      return dispatch(receiveUserError());
-    });
-  };
-}
-
-export function checkUsername(id, data) {
-  const query = Object.assign({}, data);
-  delete query.token;
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/user/${query.username}`)
-    .then(response => response.json())
-    .then(user => {
-      if(user.username){
-        return dispatch(receiveUsernameExistError());
-      }
-      return dispatch(receiveUsernameNotExist());
-    })
-    .catch(error => {
-      console.error('error retreiving user:', error);
-      return dispatch(receiveUserError());
-    });
-  };
 }
 
 export const reviewQuilt = (file) => ({

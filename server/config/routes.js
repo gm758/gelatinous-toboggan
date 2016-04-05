@@ -30,7 +30,7 @@ export default (app) => {
               token: Authentication.tokenForUser(user.get('email'))
             })
         } else {
-          res.status(400).send('Invalid Login')
+          res.status(400).send({errorMessage: 'Invalid Login'})
         }
       })
       .catch(error => res.status(500).send(`Failed verify user request: ${error}`));
@@ -54,19 +54,13 @@ export default (app) => {
   });
 
   app.put('/api/auth', requireAuth, (req, res) => {
+    const user = req.user;
     let body = '';
     req.on('data', data => body += data);
     req.on('end', () => {
-      controller.getUser(JSON.parse(body))
-      .then((user) => {
-        if(user){
-          res.status(409).send('already exists');
-        } else {
-          controller.updateUser(req.query.userId, JSON.parse(body))
-          .then(() => res.status(204).send('Successfully updated'))
-          .catch(error => res.status(500).send(`Failed to update user: ${error}`));
-        }
-      }).catch(error => res.status(500).send(`Failed update user request: ${error}`));
+      user.update(JSON.parse(body))
+        .then(() => res.status(204).send('Successfully updated'))
+        .catch(error => res.status(500).send(`Failed to update user: ${error}`));
     })
   });
 
@@ -123,21 +117,6 @@ export default (app) => {
     writeVideoToDiskPipeline(req, res, data, false);
   });
 
-  app.get('/api/users', requireAuth, (req, res) => {
-    const username = req.query.username;
-    controller.getUser({ username })
-      .then(user => {
-        if (user) {
-          res.status(200).send({
-            id: user.get('id'),
-            username: user.get('username'),
-          });
-        } else {
-          res.sendStatus(400);
-        }
-      });
-  })
-
   app.get('/api/friends/:id', requireAuth, (req, res) => {
     if (_.isEmpty(req.params.id)) {
       res.status(400).send('Failed to retrieve user');
@@ -161,13 +140,34 @@ export default (app) => {
     })
   });
 
+  // app.get('/api/users', requireAuth, (req, res) => {
+  //   const username = req.query.username;
+  //   controller.getUser({ username })
+  //   .then(user => {
+  //     if (user) {
+  //       res.status(200).send({
+  //         id: user.get('id'),
+  //         username: user.get('username'),
+  //       });
+  //     } else {
+  //       res.sendStatus(400);
+  //     }
+  //   });
+  // })
+
   app.get('/api/user/:username', (req, res) => {
     if (_.isEmpty(req.params.username)) {
       res.status(400).send('Failed to retrieve user');
     } else {
       controller.getUser(req.params)
-      .then((data) => res.status(200).send(data || {}))
-      .catch((error) => res.status(500).send(`Failed get user request: ${error}`));
+        .then(user => {
+          if (user) {
+            res.status(200).send(user)
+          } else {
+            res.status(404).send({ message: 'User does not exist'})
+          }
+        })
+        .catch(error => res.status(500).send(`Failed get user request: ${error}`));
     }
   });
 

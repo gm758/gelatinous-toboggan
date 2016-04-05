@@ -1,7 +1,6 @@
 import passport from 'passport';
 import config from '../../config/config';
-import { Strategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 import controller from '../controllers/index';
 
 const jwtOptions = {

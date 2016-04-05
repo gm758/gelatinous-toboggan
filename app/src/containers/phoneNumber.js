@@ -11,6 +11,7 @@ import PhoneInput from '../components/phone_input';
 import { updateUser } from '../actions/index';
 import { MKButton } from 'react-native-material-kit';
 import { login } from '../assets/styles';
+import ip from '../config';
 
 const CustomButton = new MKButton.Builder()
   .withStyle(login.button)
@@ -33,8 +34,12 @@ class PhoneNumber extends Component {
   }
 
   onEnter() {
-    this.props.updateUser(this.props.userId, { phoneNumber: this.state.phoneNumber, token: this.props.token });
-    this.props.navigator.replace({ name: 'contacts' });
+    fetch(`http://${ip}:8000/api/auth?token=${this.props.token}`, {
+      method: 'PUT',
+      body: JSON.stringify({ phoneNumber: this.state.phoneNumber }),
+    })
+    .then(() => this.props.navigator.replace({ name: 'contacts' }))
+    .catch(error => console.error('error updating user:', error));
   }
 
   render() {
@@ -47,7 +52,7 @@ class PhoneNumber extends Component {
             onChangeText={this.onType}
           />
           <CustomButton onPress={this.onEnter}>
-            <Text style={login.buttonText}>{this.props.loginOrSignup}</Text>
+            <Text style={login.buttonText}>Continue</Text>
           </CustomButton>
         </View>
       </View>
@@ -56,19 +61,9 @@ class PhoneNumber extends Component {
 }
 
 function mapStateToProps(state) {
-  const user = state.get('user');
   return {
-    userId: user.get('id'),
-    token: user.get('token'),
+    token: state.get('auth').get('token'),
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    updateUser: (id, data) => {
-      dispatch(updateUser(id, data));
-    },
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(PhoneNumber);
+export default connect(mapStateToProps)(PhoneNumber);
