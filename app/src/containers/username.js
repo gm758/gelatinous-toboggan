@@ -2,6 +2,7 @@
 import React from 'react-native';
 import { connect } from 'react-redux';
 const {
+  ActivityIndicatorIOS,
   Component,
   Text,
   View,
@@ -27,7 +28,11 @@ class Username extends Component {
     this.onEnter = this.onEnter.bind(this);
     this.checkUsername = _.debounce(this.checkUsername.bind(this), 500);
 
-    this.state = { username: '', duplicate: false };
+    this.state = {
+      username: '',
+      duplicate: false,
+      isChecking: false,
+    };
   }
 
   checkUsername() {
@@ -35,16 +40,16 @@ class Username extends Component {
     fetch(`http://${ip}:8000/api/user/${this.state.username.toLowerCase()}`)
       .then(response => {
         if (response.status === 200) {
-          this.setState({ duplicate: true });
+          this.setState({ duplicate: true, isChecking: false });
         } else {
-          this.setState({ duplicate: false });
+          this.setState({ duplicate: false, isChecking: false });
         }
       })
       .catch(error => console.error('error retreiving user:', error));
   }
 
   onType(username) {
-    this.setState({ username });
+    this.setState({ username, isChecking: true });
     this.checkUsername();
   }
 
@@ -62,7 +67,12 @@ class Username extends Component {
 
   render() {
     let icon;
-    if (this.state.username && this.state.duplicate) {
+    if (this.state.isChecking) {
+      icon = <ActivityIndicatorIOS
+        animating={true}
+        size="small"
+      />;
+    } else if (this.state.duplicate) {
       icon = <Icon name="close" color="red" size={16} />
     } else if (this.state.username) {
       icon = <Icon name="check" color="green" size={16} />
