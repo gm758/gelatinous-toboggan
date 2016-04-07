@@ -1,11 +1,11 @@
 import React from 'react-native';
 import { login } from '../assets/styles';
+import BottomButton from './button_bottom';
+
 const {
-  Component,
   Text,
   View,
 } = React;
-import BottomButton from './button_bottom';
 
 const LoginOrSignup = ({ onLoginSelect, onSignupSelect }) => (
   <View style={login.container}>

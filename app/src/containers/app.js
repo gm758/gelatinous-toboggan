@@ -22,10 +22,6 @@ import SignUp from './signup_container';
 import FindFriends from './find_friends';
 import { connect } from 'react-redux';
 import { isLoggedIn } from '../actions/index';
-import ip from '../config';
-
-
-import Keychain from 'react-native-keychain';
 
 const {
   Component,

@@ -2,13 +2,8 @@
 import {
   REQUEST_USER,
   RECEIVE_USER,
-  SELECT_WATCH_QUILT,
-  REQUEST_FRIENDS,
-  RECEIVE_FRIENDS,
   REQUEST_NOTIFS,
   RECEIVE_NOTIFS,
-  RECEIVE_QUILTS,
-  REQUEST_QUILTS,
   RECEIVE_POST_QUILT,
   REQUEST_POST_QUILT,
   REQUEST_ADD_QUILT,
@@ -18,10 +13,7 @@ import {
   ADD_TO_QUILT,
   WATCH_QUILT,
   LOGIN_OR_SIGNUP,
-  RECEIVE_USER_ERROR,
   INVITE_FRIENDS,
-  RECEIVE_USERNAME_EXIST_ERROR,
-  RECEIVE_USERNAME_NOT_EXIST,
   REQUEST_CONTACTS,
   RECEIVE_CONTACTS,
 } from '../constants/ActionTypes';
@@ -61,25 +53,13 @@ const receiveUser = (user) => ({
   payload: user,
 });
 
-const receiveUserError = () => ({
-  type: RECEIVE_USER_ERROR,
-});
-
-const receiveUsernameExistError = () => ({
-  type: RECEIVE_USERNAME_EXIST_ERROR,
-});
-
-const receiveUsernameNotExist = () => ({
-  type: RECEIVE_USERNAME_NOT_EXIST,
-});
-
 export function isLoggedIn() {
   return (dispatch) => {
     dispatch(requestUser());
     return Keychain.getInternetCredentials(`${ip}`)
       .then(credentials => dispatch(receiveUser(JSON.parse(credentials.username))))
-      .catch(err => dispatch(receiveUser()));
-  }
+      .catch(() => dispatch(receiveUser()));
+  };
 }
 
 export const reviewQuilt = (file) => ({
@@ -154,42 +134,14 @@ export function postToExistingQuilt(data) {
   };
 }
 
-// get all users from server
-const requestFriends = () => ({
-  type: REQUEST_FRIENDS,
+const requestContacts = () => ({
+  type: REQUEST_CONTACTS,
 });
 
-// uncommnet when not testing
-const receiveFriends = (friends) => ({
-  type: RECEIVE_FRIENDS,
-  payload: friends,
+const receiveContacts = (data) => ({
+  type: RECEIVE_CONTACTS,
+  payload: data,
 });
-
-export function fetchFriends(options) {
-  return (dispatch) => {
-    dispatch(requestFriends());
-    // todo: catch errors
-
-    return fetch(`http://${ip}:8000/api/friends/${options.id}?token=${options.token}`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(json => dispatch(receiveFriends(json)));
-  };
-}
-
-const requestContacts = () => {
-  return {
-    type: REQUEST_CONTACTS,
-  }
-}
-
-const receiveContacts = (data) => {
-  return {
-    type: RECEIVE_CONTACTS,
-    payload: data,
-  }
-}
 
 // TODO: clean up
 export function getUserContacts(token, userId) {
@@ -214,11 +166,11 @@ export function getUserContacts(token, userId) {
         })
         .then(response => {
           const usersInContacts = _.uniq(JSON.parse(response._bodyInit), 'username');
-          dispatch(receiveContacts(usersInContacts))
+          dispatch(receiveContacts(usersInContacts));
         });
       }
     });
-  }
+  };
 }
 
 // add authentication, dispatches

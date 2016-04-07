@@ -3,7 +3,6 @@ import React from 'react-native';
 const {
   PropTypes,
   Text,
-  StyleSheet,
   TouchableHighlight,
 } = React;
 
