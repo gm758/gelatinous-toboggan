@@ -18,7 +18,7 @@ const FriendEntry = (props) => (
     onPress={() => props.onCheck(props.user.rowId)}
   >
     <View>
-      <Icon name={props.user.checked ? 'check-square-o' :'square-o'} size={30} />
+      <Icon name={props.user.checked ? 'check-square-o' : 'square-o'} size={30} />
       <Text>{props.user.username}</Text>
     </View>
   </TouchableHighlight>

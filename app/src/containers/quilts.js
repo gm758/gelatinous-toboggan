@@ -10,7 +10,6 @@ import NavBar from '../components/navbar';
 const {
   ListView,
   PropTypes,
-  Text,
   View,
   ActivityIndicatorIOS,
 } = React;
@@ -52,17 +51,17 @@ class ShowQuilts extends Component {
   }
 
   render() {
-    let quiltsListView = <ListView
+    let quiltsListView = (<ListView
       dataSource={this.getDataSource()}
       renderRow={this.onRenderRow}
-    />;
+    />);
 
     if (this.props.quilts.get('isFetching')) {
-      quiltsListView = <ActivityIndicatorIOS
-        animating={true}
-        style={{height: 80}}
+      quiltsListView = (<ActivityIndicatorIOS
+        animating
+        style={{ height: 80 }}
         size="large"
-      />;
+      />);
     }
 
     return (

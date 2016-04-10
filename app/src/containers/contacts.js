@@ -8,7 +8,6 @@ import React, { Component } from 'react-native';
 import FriendEntry from '../components/friend_entry';
 import { connect } from 'react-redux';
 import Immutable from 'immutable'; // just for testing
-import Contacts from 'react-native-contacts';
 import { getUserContacts, postFriends } from '../actions/index';
 import Button from '../components/button';
 
@@ -16,7 +15,6 @@ const {
   ListView,
   PropTypes,
   StyleSheet,
-  Text,
   View,
   ActivityIndicatorIOS,
 } = React;
@@ -51,7 +49,7 @@ class ContactsContainer extends Component {
 
 
   onSubmitClick() {
-    const friends = Object.keys(this.state.checkedFriends).map(id => parseInt(id));
+    const friends = Object.keys(this.state.checkedFriends).map(id => parseInt(id, 10));
     this.props.postFriends(this.props.userId, this.props.token, friends);
     this.props.navigator.push({ name: 'home' });
   }
@@ -59,7 +57,7 @@ class ContactsContainer extends Component {
   onRenderRow(rowData) {
     return (
       <FriendEntry
-        user={{id: rowData.id, username: rowData.fullName}}
+        user={{ id: rowData.id, username: rowData.fullName }}
         onCheck={this.onCheck}
         key={rowData.id}
       />
@@ -73,18 +71,18 @@ class ContactsContainer extends Component {
 
   render() {
     if (this.props.contacts.get('isFetching')) {
-      return <ActivityIndicatorIOS
-        animating={true}
-        style={{height: 80}}
+      return (<ActivityIndicatorIOS
+        animating
+        style={{ height: 80 }}
         size="large"
-      />;
+      />);
     }
     return (
       <View>
         <ListView
-        style={styles.container}
-        dataSource={this.getDataSource()}
-        renderRow={this.onRenderRow}
+          style={styles.container}
+          dataSource={this.getDataSource()}
+          renderRow={this.onRenderRow}
         />
         <Button text="Submit" onPress={this.onSubmitClick} />
       </View>
@@ -94,7 +92,6 @@ class ContactsContainer extends Component {
 
 ContactsContainer.propTypes = {
   onPress: PropTypes.func,
-  // quilts: PropTypes.object,
   friends: PropTypes.object,
 };
 
@@ -117,10 +114,10 @@ const mapStateToProps = (state) => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getUserContacts: (token, uid) => {
+    getUserContacts(token, uid) {
       return dispatch(getUserContacts(token, uid));
     },
-    postFriends: (userId, token, friendIds) => {
+    postFriends(userId, token, friendIds) {
       return dispatch(postFriends(userId, token, ...friendIds));
     },
   };

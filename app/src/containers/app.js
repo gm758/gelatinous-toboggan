@@ -11,7 +11,6 @@ import SelectFriendsContainer from '../containers/selectFriends_container';
 import ShowQuilts from './quilts';
 import ShowCamera from './camera';
 import WatchVideo from './video';
-import FriendsContainer from './friends';
 import LoginOrSignup from './login_or_signup';
 import PhoneNumber from './phoneNumber';
 import Username from './username';
@@ -25,6 +24,7 @@ import { isLoggedIn } from '../actions/index';
 
 const {
   Component,
+  PropTypes,
   Navigator,
   View,
 } = React;
@@ -36,7 +36,6 @@ const ROUTES = {
   contacts: ContactsContainer,
   create: CreateQuilt,
   findFriends: FindFriends,
-  friends: FriendsContainer,
   home: Home,
   login: LoginContainer,
   loginOrSignup: LoginOrSignup,
@@ -51,7 +50,7 @@ const ROUTES = {
 
 class App extends Component {
   componentWillMount() {
-    this.props.isLoggedIn()
+    this.props.isLoggedIn();
   }
 
   configScene() {
@@ -76,12 +75,16 @@ class App extends Component {
   }
 }
 
+App.propTypes = {
+  isLoggedIn: PropTypes.func,
+};
+
 function mapDispatchToProps(dispatch) {
   return {
-    isLoggedIn: () => {
+    isLoggedIn() {
       return dispatch(isLoggedIn());
-    }
-  }
+    },
+  };
 }
 
 export default connect(null, mapDispatchToProps)(App);

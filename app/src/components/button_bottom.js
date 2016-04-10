@@ -18,6 +18,8 @@ const BottomButton = ({ onPress, text, buttonStyle, buttonTextStyle }) => (
 );
 
 BottomButton.propTypes = {
+  buttonStyle: PropTypes.number,
+  buttonTextStyle: PropTypes.number,
   onPress: PropTypes.func,
   text: PropTypes.string,
 };

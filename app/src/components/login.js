@@ -1,13 +1,10 @@
 /* eslint-disable no-use-before-define */
 import React from 'react-native';
 import { MKButton } from 'react-native-material-kit';
-import { login, colors } from '../assets/styles';
+import { login } from '../assets/styles';
 import EmailInput from './email_input';
 import PasswordInput from './password_input';
 import NavBar from './navbar';
-import Keychain from 'react-native-keychain';
-import ip from '../config';
-import _ from 'lodash';
 
 const {
   Component,
@@ -80,7 +77,7 @@ class Login extends Component {
           </CustomButton>
           <ActivityIndicatorIOS
             animating={this.props.isFetching}
-            style={{height: 80}}
+            style={{ height: 80 }}
             size="large"
           />
         </View>

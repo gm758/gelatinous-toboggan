@@ -1,4 +1,3 @@
-import React from 'react-native';
 import { mdl } from 'react-native-material-kit';
 import { login, colors } from '../assets/styles';
 

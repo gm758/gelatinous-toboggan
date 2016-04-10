@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import React from 'react-native';
 import { MKButton } from 'react-native-material-kit';
-import { login, colors } from '../assets/styles';
+import { login } from '../assets/styles';
 import EmailInput from './email_input';
 import PasswordInput from './password_input';
 import NavBar from './navbar';
@@ -9,7 +9,6 @@ import Validator from 'email-validator';
 import owasp from 'owasp-password-strength-test';
 import Keychain from 'react-native-keychain';
 import ip from '../config';
-import _ from 'lodash';
 
 const {
   Component,
@@ -63,9 +62,9 @@ class SignUp extends Component {
     if (!Validator.validate(this.state.email)) {
       console.log(this.state.email, ' is invalid, please try again.');
     } else if (!owasp.test(this.state.password)) {
-      console.log('Weak password')
+      console.log('Weak password');
     } else {
-      this.props.signupUser(emailToLowercase, this.state.password)
+      this.props.signupUser(emailToLowercase, this.state.password);
     }
   }
 
@@ -102,7 +101,7 @@ class SignUp extends Component {
           </CustomButton>
           <ActivityIndicatorIOS
             animating={this.props.isFetching}
-            style={{height: 80}}
+            style={{ height: 80 }}
             size="large"
           />
         </View>

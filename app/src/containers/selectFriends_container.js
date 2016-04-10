@@ -1,4 +1,4 @@
-  /* eslint-disable
+/* eslint-disable
 react/prefer-stateless-function,
 no-use-before-define,
 react/jsx-no-bind,
@@ -7,7 +7,6 @@ react/prop-types
 import React, { Component } from 'react-native';
 import FriendEntry from '../components/friend_entry';
 import { connect } from 'react-redux';
-import Immutable from 'immutable'; // just for testing
 import { inviteFriends } from '../actions/index';
 import Button from '../components/button';
 import ip from '../config';
@@ -20,7 +19,6 @@ const {
   ListView,
   PropTypes,
   StyleSheet,
-  Text,
   View,
   ActivityIndicatorIOS,
 } = React;
@@ -40,6 +38,7 @@ class SelectFriendsContainer extends Component {
     this.state = {
       dataSource: ds.cloneWithRows([]),
       db: [],
+      isFetching: true,
     };
   }
 
@@ -49,6 +48,7 @@ class SelectFriendsContainer extends Component {
     })
     .then(response => response.json())
     .then((friends) => {
+      // TODO: make mappedFriends an immutable list of maps
       const mappedFriends = friends.map((friend, index) => ({
         id: friend.id,
         username: friend.username,
@@ -59,6 +59,7 @@ class SelectFriendsContainer extends Component {
       this.setState({
         dataSource: this.state.dataSource.cloneWithRows(mappedFriends),
         db: mappedFriends,
+        isFetching: false,
       });
     });
   }
@@ -68,7 +69,7 @@ class SelectFriendsContainer extends Component {
     newArray[rowId] = Object.assign(
       {},
       newArray[rowId],
-      { checked: !newArray[rowId].checked },
+      { checked: !newArray[rowId].checked }
     );
 
     this.setState({
@@ -103,14 +104,13 @@ class SelectFriendsContainer extends Component {
   }
 
   render() {
-    // if (this.props.friends.get('isFetching')) {
-    //   return <ActivityIndicatorIOS
-    //     animating={true}
-    //     style={{height: 80}}
-    //     size="large"
-    //   />;
-    // }
-    console.log(this.state.dataSource);
+    if (this.state.isFetching) {
+      return (<ActivityIndicatorIOS
+        animating
+        style={{ height: 80 }}
+        size="large"
+      />);
+    }
     return (
       <View style={selectFriends.container}>
         <NavBar onPress={this.props.navigator.pop} />

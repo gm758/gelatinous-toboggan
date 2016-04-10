@@ -11,7 +11,7 @@ const leftButton = (onPress) => (
   <Text style={navbar.leftButton} onPress={onPress}>Back</Text>
 );
 
-const NavBar = ({ onPress, text='Quilt' }) => (
+const NavBar = ({ onPress, text = 'Quilt' }) => (
   onPress ?
     <NavigationBar style={navbar.bar} statusBar={{ hidden: true }}
       title={<Text style={navbar.text}>{text}</Text>}
@@ -26,6 +26,7 @@ const NavBar = ({ onPress, text='Quilt' }) => (
 
 NavBar.propTypes = {
   onPress: PropTypes.func,
+  text: PropTypes.string,
 };
 
 export default NavBar;

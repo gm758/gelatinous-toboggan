@@ -2,13 +2,11 @@ import React from 'react-native';
 import { connect } from 'react-redux';
 const {
   Component,
+  PropTypes,
   Text,
-  TextInput,
   View,
 } = React;
-import Button from '../components/button';
 import PhoneInput from '../components/phone_input';
-import { updateUser } from '../actions/index';
 import { MKButton } from 'react-native-material-kit';
 import { login } from '../assets/styles';
 import ip from '../config';
@@ -26,7 +24,6 @@ class PhoneNumber extends Component {
     this.state = {
       phoneNumber: '',
     };
-
   }
 
   onType(phoneNumber) {
@@ -59,6 +56,11 @@ class PhoneNumber extends Component {
     );
   }
 }
+
+PhoneNumber.propTypes = {
+  navigator: PropTypes.object,
+  token: PropTypes.string,
+};
 
 function mapStateToProps(state) {
   return {

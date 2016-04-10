@@ -1,12 +1,7 @@
 /* eslint-disable react/prefer-stateless-function, no-use-before-define */
-import React, { Component } from 'react-native';
+import React, { Component, PropTypes } from 'react-native';
 import { connect } from 'react-redux';
 import LoginOrSignup from '../components/login_or_signup';
-import { selectLoginOrSignup } from '../actions/index';
-import { bindActionCreators } from 'redux';
-
-import Contacts from 'react-native-contacts';
-import { crossReferenceContacts } from '../actions/index';
 
 class LoginOrSignupContainer extends Component {
   constructor(props) {
@@ -18,7 +13,7 @@ class LoginOrSignupContainer extends Component {
   // TODO: verify token
   componentWillReceiveProps(newProps) {
     if (newProps.token) {
-      this.props.navigator.resetTo({ name: 'home' })
+      this.props.navigator.resetTo({ name: 'home' });
     }
   }
 
@@ -27,7 +22,7 @@ class LoginOrSignupContainer extends Component {
   }
 
   onSignupSelect() {
-    this.props.navigator.push({ name: 'signup'});
+    this.props.navigator.push({ name: 'signup' });
   }
 
   render() {
@@ -36,6 +31,10 @@ class LoginOrSignupContainer extends Component {
     );
   }
 }
+
+LoginOrSignupContainer.propTypes = {
+  navigator: PropTypes.object,
+};
 
 function mapStateToProps(state) {
   return {

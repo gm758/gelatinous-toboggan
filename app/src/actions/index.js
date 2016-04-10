@@ -1,4 +1,3 @@
-/* eslint no-console: [2, { allow: ["warn", "error"] }] */
 import {
   REQUEST_USER,
   RECEIVE_USER,
@@ -20,7 +19,7 @@ import {
 
 import ip from '../config';
 import Keychain from 'react-native-keychain';
-import Contacts from 'react-native-contacts';
+import Contacts from 'react-native-contacts'; // TODO: promisify
 import _ from 'lodash';
 
 export const selectLoginOrSignup = (selection) => ({
@@ -147,7 +146,7 @@ const receiveContacts = (data) => ({
 export function getUserContacts(token, userId) {
   return (dispatch) => {
     dispatch(requestContacts());
-    return Contacts.getAll((err, contacts) => {
+    Contacts.getAll((err, contacts) => {
       if (err) {
         console.log('error', err);
       } else {
@@ -160,7 +159,7 @@ export function getUserContacts(token, userId) {
           return acc;
         }, []);
 
-        return fetch(`http://${ip}:8000/api/cross?userId=${userId}&token=${token}`, {
+        fetch(`http://${ip}:8000/api/cross?userId=${userId}&token=${token}`, {
           method: 'POST',
           body: JSON.stringify(cleanContacts),
         })
@@ -173,9 +172,9 @@ export function getUserContacts(token, userId) {
   };
 }
 
-// add authentication, dispatches
+// TODO: remove from action creators into component
 export function postFriends(userId, token, ...friendsId) {
-  return (dispatch) => fetch(`http://${ip}:8000/api/friends/${userId}?token=${token}`, {
+  return () => fetch(`http://${ip}:8000/api/friends/${userId}?token=${token}`, {
     method: 'POST',
     body: JSON.stringify({ friends: friendsId }),
   });

@@ -4,10 +4,9 @@ import { connect } from 'react-redux';
 const {
   ActivityIndicatorIOS,
   Component,
+  PropTypes,
   Text,
   View,
-  StyleSheet,
-  PropTypes,
 } = React;
 import UsernameInput from '../components/username_input';
 import { login } from '../assets/styles';
@@ -35,18 +34,6 @@ class Username extends Component {
     };
   }
 
-  checkUsername() {
-    // TODO: revisit status codes, make more robust
-    fetch(`http://${ip}:8000/api/user/${this.state.username.toLowerCase()}`)
-      .then(response => {
-        if (response.status === 200) {
-          this.setState({ duplicate: true, isChecking: false });
-        } else {
-          this.setState({ duplicate: false, isChecking: false });
-        }
-      })
-      .catch(error => console.error('error retreiving user:', error));
-  }
 
   onType(username) {
     this.setState({ username, isChecking: true });
@@ -65,17 +52,30 @@ class Username extends Component {
     }
   }
 
+  checkUsername() {
+    // TODO: revisit status codes, make more robust
+    fetch(`http://${ip}:8000/api/user/${this.state.username.toLowerCase()}`)
+    .then(response => {
+      if (response.status === 200) {
+        this.setState({ duplicate: true, isChecking: false });
+      } else {
+        this.setState({ duplicate: false, isChecking: false });
+      }
+    })
+    .catch(error => console.error('error retreiving user:', error));
+  }
+
   render() {
     let icon;
     if (this.state.isChecking) {
-      icon = <ActivityIndicatorIOS
-        animating={true}
+      icon = (<ActivityIndicatorIOS
+        animating
         size="small"
-      />;
+      />);
     } else if (this.state.duplicate) {
-      icon = <Icon name="close" color="red" size={16} />
+      icon = <Icon name="close" color="red" size={16} />;
     } else if (this.state.username) {
-      icon = <Icon name="check" color="green" size={16} />
+      icon = <Icon name="check" color="green" size={16} />;
     }
 
     return (
@@ -83,8 +83,8 @@ class Username extends Component {
         <View style={login.containerBody}>
           <Text>Select a Username</Text>
           <UsernameInput
-          value={this.state.username}
-          onChangeText={this.onType}
+            value={this.state.username}
+            onChangeText={this.onType}
           />
           {icon}
           <CustomButton onPress={this.onEnter}>
@@ -95,31 +95,6 @@ class Username extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    padding: 4,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    margin: 5,
-    width: 200,
-    alignSelf: 'center',
-  },
-  label: {
-    fontSize: 18,
-  },
-  errorMsg: {
-    fontSize: 18,
-    color: 'red',
-  },
-});
 
 Username.propTypes = {
   navigator: PropTypes.object,
