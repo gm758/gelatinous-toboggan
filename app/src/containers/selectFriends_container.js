@@ -12,6 +12,10 @@ import { fetchFriends } from '../actions/index';
 import Button from '../components/button';
 import { inviteFriends } from '../actions/index';
 
+import { selectFriends, login } from '../assets/styles';
+import NavBar from '../components/navbar';
+import BottomButton from '../components/button_bottom';
+
 const {
   ListView,
   PropTypes,
@@ -91,12 +95,13 @@ class SelectFriendsContainer extends Component {
       />;
     }
     return (
-      <View style={styles.container}>
+      <View style={selectFriends.container}>
+        <NavBar onPress={this.props.navigator.pop} />
         <ListView
           dataSource={this.getDataSource()}
           renderRow={this.onRenderRow}
         />
-        <Button text={'Invite!'} onPress={this.onInvitePress} />
+        <BottomButton buttonTextStyle={login.buttonText} buttonStyle={login.loginButton} text="Invite" onPress={this.onInvitePress} />
       </View>
     );
   }

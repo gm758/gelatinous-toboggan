@@ -4,6 +4,8 @@ import Camera from 'react-native-camera';
 import { connect } from 'react-redux';
 import { reviewQuilt, selectWatchQuilt } from '../actions/index';
 import Button from '../components/button';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { camera } from '../assets/styles';
 
 const {
   Component,
@@ -11,6 +13,7 @@ const {
   PropTypes,
   StyleSheet,
   Text,
+  TouchableHighlight,
   View,
 } = React;
 
@@ -73,22 +76,26 @@ class ShowCamera extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
-        <Camera
-          ref={this.cameraRef}
-          style={styles.preview}
-          aspect={'fill'}
-          captureTarget={Camera.constants.CaptureTarget.temp}
-          captureMode={Camera.constants.CaptureMode.video}
-          captureQuality={Camera.constants.CaptureQuality.medium}
-          type={this.state.type}
-        >
-          <Text style={styles.capture} onPress={this.onCapturePress}>
-            [CAPTURE]
-          </Text>
-          <Button text="SELFIE!" onPress={this.reverseCamera} />
-        </Camera>
-      </View>
+      <Camera
+        ref={this.cameraRef}
+        style={camera.preview}
+        aspect={'fill'}
+        captureTarget={Camera.constants.CaptureTarget.temp}
+        captureMode={Camera.constants.CaptureMode.video}
+        captureQuality={Camera.constants.CaptureQuality.medium}
+        type={this.state.type}
+      >
+        <View style={camera.containerA}>
+          <TouchableHighlight style={camera.iconContainerA} onPress={this.reverseCamera}>
+            <Icon name="refresh" size={40}/>
+          </TouchableHighlight>
+        </View>
+        <View style={camera.containerB}>
+          <TouchableHighlight style={camera.iconContainerB} onPress={this.onCapturePress}>
+            <Icon name="camera" size={40}/>
+          </TouchableHighlight>
+        </View>
+      </Camera>
     );
   }
 

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 export const colors = {
   beige: '#FCF3F0',
@@ -110,7 +110,7 @@ export const home = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 20,
-    fontFamily: 'Pacifico',
+    // fontFamily: 'Pacifico',
   },
 });
 
@@ -125,10 +125,18 @@ export const quiltEntry = StyleSheet.create({
   highlight: {
     height: 80,
     padding: 5,
-    margin: 2,
+    margin: 5,
     borderColor: 'gray',
     borderWidth: 2,
     borderRadius: 4,
+    borderStyle: 'dashed',
+    backgroundColor: 'white',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowColor: 'black',
+    borderRadius: 8,
+    borderColor: colors.auburn,
+    borderWidth: 3,
   },
   row: {
     flex: 1,
@@ -154,8 +162,17 @@ export const create = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.beige,
   },
-  buttonContainer: {
+  innerContainerA: {
     flex: 1,
+    alignItems: 'center',
+  },
+  innerContainerB: {
+    flex: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    flex: 2,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -173,5 +190,146 @@ export const create = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 20,
+  },
+  textfield: {
+    marginBottom: 20,
+    height: 35,
+    width: 250,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  textInput: {
+    color: colors.gray,
+  },
+  text: {
+    color: colors.auburn,
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+});
+
+export const username = StyleSheet.create({
+  text: {
+    color: colors.gray,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+});
+
+export const images = StyleSheet.create({
+  machine: {
+    marginBottom: 50,
+    height: 250,
+    width: 280,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+});
+
+export const camera = StyleSheet.create({
+  preview: {
+    flex: 1,
+  },
+  containerA: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+  },
+  containerB: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  iconContainerA: {
+    height: 60,
+    width: 60,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 20,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowColor: 'black',
+  },
+  iconContainerB: {
+    height: 70,
+    width: 70,
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 20,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowColor: 'black',
+  },
+});
+
+export const video = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.beige,
+  },
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+  },
+  iconContainerA: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.eucalyptus,
+    height: 40,
+    padding: 10,
+    borderRadius: 100,
+    marginBottom: 26,
+    marginLeft: 10,
+    marginRight: 10,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowColor: 'black',
+  },
+  iconContainerB: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.auburn,
+    height: 40,
+    padding: 10,
+    borderRadius: 100,
+    marginBottom: 26,
+    marginLeft: 10,
+    marginRight: 10,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowColor: 'black',
+  },
+  check: {
+    color: 'white',
+  },
+  close: {
+    color: 'white',
+  },
+});
+
+export const selectFriends = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.beige,
   },
 });
