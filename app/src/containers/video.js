@@ -23,7 +23,8 @@ class WatchVideo extends Component {
     this.onAccept = this.onAccept.bind(this);
     this.onReject = this.onReject.bind(this);
 
-    if (this.props.currentQuilt.status === 'watchAdd' || this.props.currentQuilt.status === 'watch') {
+    if (this.props.currentQuilt.status === 'watchAdd'
+     || this.props.currentQuilt.status === 'watch') {
       this.url = `http://${ip}:8000/api/quilt/${this.props.currentQuilt.id}?token=${this.props.token}`;
     } else {
       this.url = this.props.currentQuilt.file;
@@ -55,14 +56,14 @@ class WatchVideo extends Component {
           this.props.postQuilt(Object.assign(this.props.currentQuilt, {
             creator: this.props.creator,
             video: data,
-            token: this.props.token
+            token: this.props.token,
           }));
         } else {
           this.props.postToExistingQuilt({
             quiltId: this.props.currentQuilt.id,
             creator: this.props.creator,
             video: data,
-            token: this.props.token
+            token: this.props.token,
           });
         }
         this.props.navigator.replace({ name: 'home' });
@@ -74,15 +75,17 @@ class WatchVideo extends Component {
   }
 
   render() {
-    let acceptButton, rejectButton;
+
+    let acceptText;
+    let rejectText;
     let repeat = true;
     if (this.props.currentQuilt.status === 'watch') {
       acceptButton = <Icon name="play" style={video.check} size={40} />;
       rejectButton = <Icon name="undo" style={video.check} size={40} />;
       repeat = false;
     } else if (this.props.currentQuilt.status === 'watchAdd') {
-      acceptButton = <Icon name="check" style={video.check} size={40} />;
-      rejectButton = <Icon name="check" style={video.check} size={40} />;
+      acceptText = 'Contribute';
+      rejectText = 'Back';
     } else {
       acceptButton = <Icon name="check" style={video.check} size={40} />;
       rejectButton = <Icon name="close" style={video.close} size={40} />;
@@ -113,10 +116,12 @@ class WatchVideo extends Component {
 WatchVideo.propTypes = {
   addToQuilt: PropTypes.func,
   currentQuilt: PropTypes.object,
+  postToExistingQuilt: PropTypes.func,
   creator: PropTypes.object,
   navigator: PropTypes.object,
   postQuilt: PropTypes.func,
   watchQuiltId: PropTypes.number,
+  token: PropTypes.string,
 };
 
 function mapStateToProps(state) {

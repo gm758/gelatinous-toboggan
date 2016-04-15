@@ -1,7 +1,4 @@
 /* eslint-disable no-use-before-define */
-
-// Source: https://github.com/sconxu/react-native-checkbox
-
 import React, { Component } from 'react-native';
 import _ from 'lodash';
 

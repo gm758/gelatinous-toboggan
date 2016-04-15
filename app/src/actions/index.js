@@ -1,14 +1,8 @@
-/* eslint no-console: [2, { allow: ["warn", "error"] }] */
 import {
   REQUEST_USER,
   RECEIVE_USER,
-  SELECT_WATCH_QUILT,
-  REQUEST_FRIENDS,
-  RECEIVE_FRIENDS,
   REQUEST_NOTIFS,
   RECEIVE_NOTIFS,
-  RECEIVE_QUILTS,
-  REQUEST_QUILTS,
   RECEIVE_POST_QUILT,
   REQUEST_POST_QUILT,
   REQUEST_ADD_QUILT,
@@ -18,17 +12,14 @@ import {
   ADD_TO_QUILT,
   WATCH_QUILT,
   LOGIN_OR_SIGNUP,
-  RECEIVE_USER_ERROR,
   INVITE_FRIENDS,
-  RECEIVE_USERNAME_EXIST_ERROR,
-  RECEIVE_USERNAME_NOT_EXIST,
   REQUEST_CONTACTS,
   RECEIVE_CONTACTS,
 } from '../constants/ActionTypes';
 
 import ip from '../config';
 import Keychain from 'react-native-keychain';
-import Contacts from 'react-native-contacts';
+import Contacts from 'react-native-contacts'; // TODO: promisify
 import _ from 'lodash';
 
 export const selectLoginOrSignup = (selection) => ({
@@ -61,91 +52,12 @@ const receiveUser = (user) => ({
   payload: user,
 });
 
-const receiveUserError = () => ({
-  type: RECEIVE_USER_ERROR,
-});
-
-const receiveUsernameExistError = () => ({
-  type: RECEIVE_USERNAME_EXIST_ERROR,
-});
-
-const receiveUsernameNotExist = () => ({
-  type: RECEIVE_USERNAME_NOT_EXIST,
-});
-
-export function signupUser(email, password) {
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?email=${email}&password=${password}`, {
-      method: 'POST',
-    })
-    .then(response => response.json())
-    .then(user => dispatch(receiveUser(user)))
-    .catch(error => console.error('error', error));
-  };
-}
-
-export function loginUser(usernameOrEmail, password) {
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?usernameOrEmail=${usernameOrEmail}&password=${password}`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(user => dispatch(receiveUser(user)))
-    .catch(error => dispatch(receiveUserError()));
-  };
-}
-
 export function isLoggedIn() {
   return (dispatch) => {
     dispatch(requestUser());
     return Keychain.getInternetCredentials(`${ip}`)
       .then(credentials => dispatch(receiveUser(JSON.parse(credentials.username))))
-      .catch(err => dispatch(receiveUser()));
-  }
-}
-
-export function updateUser(id, data) {
-  const query = Object.assign({}, data);
-  delete query.token;
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/auth?userId=${id}&token=${data.token}`, {
-      method: 'PUT',
-      body: JSON.stringify(query),
-    })
-    .then(user => {
-      if (user._bodyInit) {
-        console.log('user exist');
-        return dispatch(receiveUsernameExistError());
-      }
-      return dispatch(receiveUser(data));
-    })
-    .catch(error => {
-      console.error('error updating user:', error);
-      return dispatch(receiveUserError());
-    });
-  };
-}
-
-export function checkUsername(id, data) {
-  const query = Object.assign({}, data);
-  delete query.token;
-  return (dispatch) => {
-    dispatch(requestUser());
-    return fetch(`http://${ip}:8000/api/user/${query.username}`)
-    .then(response => response.json())
-    .then(user => {
-      if(user.username){
-        return dispatch(receiveUsernameExistError());
-      }
-      return dispatch(receiveUsernameNotExist());
-    })
-    .catch(error => {
-      console.error('error retreiving user:', error);
-      return dispatch(receiveUserError());
-    });
+      .catch(() => dispatch(receiveUser()));
   };
 }
 
@@ -221,48 +133,20 @@ export function postToExistingQuilt(data) {
   };
 }
 
-// get all users from server
-const requestFriends = () => ({
-  type: REQUEST_FRIENDS,
+const requestContacts = () => ({
+  type: REQUEST_CONTACTS,
 });
 
-// uncommnet when not testing
-const receiveFriends = (friends) => ({
-  type: RECEIVE_FRIENDS,
-  payload: friends,
+const receiveContacts = (data) => ({
+  type: RECEIVE_CONTACTS,
+  payload: data,
 });
-
-export function fetchFriends(options) {
-  return (dispatch) => {
-    dispatch(requestFriends());
-    // todo: catch errors
-
-    return fetch(`http://${ip}:8000/api/friends/${options.id}?token=${options.token}`, {
-      method: 'GET',
-    })
-    .then(response => response.json())
-    .then(json => dispatch(receiveFriends(json)));
-  };
-}
-
-const requestContacts = () => {
-  return {
-    type: REQUEST_CONTACTS,
-  }
-}
-
-const receiveContacts = (data) => {
-  return {
-    type: RECEIVE_CONTACTS,
-    payload: data,
-  }
-}
 
 // TODO: clean up
 export function getUserContacts(token, userId) {
   return (dispatch) => {
     dispatch(requestContacts());
-    return Contacts.getAll((err, contacts) => {
+    Contacts.getAll((err, contacts) => {
       if (err) {
         console.log('error', err);
       } else {
@@ -275,44 +159,25 @@ export function getUserContacts(token, userId) {
           return acc;
         }, []);
 
-        return fetch(`http://${ip}:8000/api/cross?userId=${userId}&token=${token}`, {
+        fetch(`http://${ip}:8000/api/cross?userId=${userId}&token=${token}`, {
           method: 'POST',
           body: JSON.stringify(cleanContacts),
         })
         .then(response => {
           const usersInContacts = _.uniq(JSON.parse(response._bodyInit), 'username');
-          dispatch(receiveContacts(usersInContacts))
+          dispatch(receiveContacts(usersInContacts));
         });
       }
     });
-  }
+  };
 }
 
-// add authentication, dispatches
+// TODO: remove from action creators into component
 export function postFriends(userId, token, ...friendsId) {
-  return (dispatch) => fetch(`http://${ip}:8000/api/friends/${userId}?token=${token}`, {
+  return () => fetch(`http://${ip}:8000/api/friends/${userId}?token=${token}`, {
     method: 'POST',
     body: JSON.stringify({ friends: friendsId }),
   });
-}
-
-const requestQuilts = () => ({
-  type: REQUEST_QUILTS,
-});
-
-const receiveQuilts = (quilts) => ({
-  type: RECEIVE_QUILTS,
-  payload: quilts,
-});
-
-export function fetchQuilts(options) {
-  return (dispatch) => {
-    dispatch(requestQuilts());
-    return fetch(`http://${ip}:8000/api/quilt?username=${options.username}&token=${options.token}`)
-      .then(response => response.json())
-      .then(data => dispatch(receiveQuilts(data)))
-      .catch(error => console.error('Error in getting user\'s quilts', error));
-  };
 }
 
 const requestNotifs = () => ({
@@ -331,13 +196,6 @@ export function fetchNotifs(userId) {
       .then((response) => response.json())
       .then((data) => dispatch(receiveNotifs(data)))
       .catch((error) => console.error('Error in getting user\'s notifications', error));
-  };
-}
-
-export function selectWatchQuilt(data) {
-  return {
-    type: SELECT_WATCH_QUILT,
-    payload: data,
   };
 }
 

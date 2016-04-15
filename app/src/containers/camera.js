@@ -26,7 +26,6 @@ class ShowCamera extends Component {
     this.onCapturePress = this.onCapturePress.bind(this);
     this.reverseCamera = this.reverseCamera.bind(this);
 
-    // refactor into redux?
     this.state = {
       isCapturing: false,
       type: 'back',
@@ -102,8 +101,10 @@ class ShowCamera extends Component {
 }
 
 ShowCamera.propTypes = {
+  currentQuilt: PropTypes.object,
   navigator: PropTypes.object,
   reviewQuilt: PropTypes.func,
+  selectWatchQuilt: PropTypes.func,
 };
 
 const styles = StyleSheet.create({
@@ -127,12 +128,8 @@ const styles = StyleSheet.create({
   },
 });
 
-// get the state of the current quilt
-// which will be passed with the video
-// to action creator to post data
 function mapStateToProps(state) {
   const currentQuilt = state.get('currentQuilt').toObject();
-  // currentQuilt.users = currentQuilt.users.toArray();
   const creator = state.get('user');
 
   return {

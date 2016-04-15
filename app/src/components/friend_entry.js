@@ -1,24 +1,28 @@
 /* eslint-disable no-use-before-define */
 import React from 'react-native';
-import CheckBox from './checkbox';
-import { friendEntry, colors } from '../assets/styles';
+import { quiltEntry, colors } from '../assets/styles';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const {
   PropTypes,
-  StyleSheet,
-  TouchableOpacity,
+  Text,
+  TouchableHighlight,
+  View,
 } = React;
 
 // todo: make these behave like check boxes (edit style=)
-const FriendEntry = ({ user, onCheck, checked }) => (
-  <CheckBox
-    label={user.username}
-    id={user.id}
-    checked={checked}
-    onCheck={() => onCheck(user.id)}
-  />
+const FriendEntry = (props) => (
+  <TouchableHighlight
+    underlayColor={colors.gray}
+    style={quiltEntry.highlight}
+    onPress={() => props.onCheck(props.user.rowId)}
+  >
+    <View>
+      <Icon name={props.user.checked ? 'check-square-o' : 'square-o'} size={30} />
+      <Text>{props.user.username}</Text>
+    </View>
+  </TouchableHighlight>
 );
-
 
 FriendEntry.propTypes = {
   user: PropTypes.object,

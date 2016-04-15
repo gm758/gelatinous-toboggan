@@ -83,18 +83,17 @@ const updateQuiltStatusToReady = (id) => {
 }
 
 // options = {username: username}
-const getAllUserQuilts = (username) => {
-  return getUser({ username })
-    .then(user => user.getQuilts({
-      where: {
-        status: {
-          $gt: 0,
-        },
+const getAllUserQuilts = (user) =>
+  user.getQuilts({
+    where: {
+      status: {
+        $gt: 0,
       },
-    }))
-    .then(mapQuilts)
-    .catch(error => console.error(`Error retrieving user's quilts: ${error}`));
-}
+    },
+  })
+  .then(mapQuilts)
+  .catch(error => console.error(`Error retrieving user's quilts: ${error}`));
+
 const getQuilt = (options) => (
   db.Quilt.findOne({ where: options })
     .catch(error => console.error(`Error retrieving quilt: ${error}`))
