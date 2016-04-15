@@ -9,7 +9,6 @@ import FriendEntry from '../components/friend_entry';
 import { connect } from 'react-redux';
 import Immutable from 'immutable'; // just for testing
 import Button from '../components/button';
-import Contacts from 'react-native-contacts';
 import { getUserContacts, postFriends } from '../actions/index';
 import NavBar from '../components/navbar';
 import ip from '../config';
@@ -21,7 +20,6 @@ const {
   StyleSheet,
   Text,
   TextInput,
-  TouchableHighlight,
   View,
 } = React;
 
@@ -49,39 +47,19 @@ class FindFriends extends Component {
   }
 
   onType(username) {
-    this.setState({ username })
+    this.setState({ username });
     this.findUser(username);
-  }
-
-  findUser(username) {
-    fetch(`http://${ip}:8000/api/users?username=${this.state.username}&token=${this.props.token}`)
-      .then(response => {
-        if (response.ok) {
-          this.setState({ db: JSON.parse(response._bodyInit) });
-        }
-      }).catch(err => console.log(err))
-
-    this.setState({
-      filteredContacts: this.props.contacts.filter(elem => {
-        return this.state.username !== '' && !!elem.username && elem.username.search(this.state.username) !== -1;
-      }),
-    });
-  }
-
-  getDataSource() {
-    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => !Immutable.is(r1, r2) });
-    return ds.cloneWithRows(this.state.filteredContacts);
   }
 
   onRenderRow(rowData) {
     // TODO: pass down onFriend method to send friend request immediately on click
     return (
-        <FriendEntry
-          user={rowData}
-          onCheck={this.onFriend}
-          checked
-          key={rowData.id}
-        />
+      <FriendEntry
+        user={rowData}
+        onCheck={this.onFriend}
+        checked
+        key={rowData.id}
+      />
     );
   }
 
@@ -91,6 +69,28 @@ class FindFriends extends Component {
 
   onFriend(id) {
     this.props.postFriends(this.props.userId, this.props.token, id);
+  }
+
+  getDataSource() {
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => !Immutable.is(r1, r2) });
+    return ds.cloneWithRows(this.state.filteredContacts);
+  }
+
+  findUser() {
+    fetch(`http://${ip}:8000/api/users?username=${this.state.username}&token=${this.props.token}`)
+    .then(response => {
+      if (response.ok) {
+        this.setState({ db: JSON.parse(response._bodyInit) });
+      }
+    }).catch(err => console.log(err));
+
+    this.setState({
+      filteredContacts: this.props.contacts.filter(elem =>
+        this.state.username !== '' &&
+        !!elem.username &&
+        elem.username.search(this.state.username) !== -1
+      ),
+    });
   }
 
   render() {
@@ -111,7 +111,7 @@ class FindFriends extends Component {
       <View style={styles.container}>
         <NavBar onPress={this.onBack} />
         <TextInput
-          style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+          style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
           placeholder="Search"
           value={this.state.username}
           onChangeText={this.onType}
@@ -129,7 +129,6 @@ class FindFriends extends Component {
 
 FindFriends.propTypes = {
   onPress: PropTypes.func,
-  // quilts: PropTypes.object,
   friends: PropTypes.object,
 };
 
@@ -153,10 +152,10 @@ const mapStateToProps = (state) => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getUserContacts: (token, uid) => {
+    getUserContacts(token, uid) {
       return dispatch(getUserContacts(token, uid));
     },
-    postFriends: (userId, token, friendIds) => {
+    postFriends(userId, token, friendIds) {
       return dispatch(postFriends(userId, token, friendIds));
     },
   };

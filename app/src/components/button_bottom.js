@@ -3,7 +3,6 @@ import React from 'react-native';
 const {
   PropTypes,
   Text,
-  StyleSheet,
   TouchableHighlight,
 } = React;
 
@@ -19,6 +18,8 @@ const BottomButton = ({ onPress, text, buttonStyle, buttonTextStyle }) => (
 );
 
 BottomButton.propTypes = {
+  buttonStyle: PropTypes.number,
+  buttonTextStyle: PropTypes.number,
   onPress: PropTypes.func,
   text: PropTypes.string,
 };

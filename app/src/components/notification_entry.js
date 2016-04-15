@@ -18,6 +18,7 @@ const NotifEntry = ({ notif }) => (
 );
 
 NotifEntry.propTypes = {
+  notif: PropTypes.object,
   user: PropTypes.object,
 };
 

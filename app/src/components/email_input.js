@@ -1,5 +1,4 @@
-import React from 'react-native';
-import { MKButton, mdl } from 'react-native-material-kit';
+import { mdl } from 'react-native-material-kit';
 import { login, colors } from '../assets/styles';
 
 const EmailInput = mdl.Textfield.textfield()

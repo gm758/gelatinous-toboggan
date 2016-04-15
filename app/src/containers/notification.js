@@ -12,13 +12,10 @@ import { fetchNotifs } from '../actions/index';
 
 const {
   ListView,
-  PropTypes,
-  StyleSheet,
-  Text,
-  View,
   ActivityIndicatorIOS,
 } = React;
 
+// TODO: adopt style of select users for this component
 class NotifContainer extends Component {
   constructor(props) {
     super(props);
@@ -43,19 +40,19 @@ class NotifContainer extends Component {
 
   render() {
     if (this.props.notifs.get('isFetching')) {
-      return <ActivityIndicatorIOS
-        animating={true}
-        style={{height: 80}}
+      return (<ActivityIndicatorIOS
+        animating
+        style={{ height: 80 }}
         size="large"
-      />;
+      />);
     }
     return (
       <ListView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         dataSource={this.getDataSource()}
         renderRow={this.onRenderRow}
       />
-    )
+    );
   }
 }
 
@@ -70,7 +67,7 @@ function mapDispatchToProps(dispatch) {
     fetchNotifs: (data) => {
       dispatch(fetchNotifs(data));
     },
-  }
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifContainer);

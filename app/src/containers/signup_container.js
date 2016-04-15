@@ -1,13 +1,13 @@
 /* eslint-disable react/prefer-stateless-function, no-use-before-define */
 import React, { Component } from 'react-native';
 import { connect } from 'react-redux';
-import Login from '../components/login';
-import { loginUser } from '../actions/auth';
+import SignUp from '../components/signup';
+import { signupUser } from '../actions/auth';
 
-class LoginContainer extends Component {
+class SignupContainer extends Component {
   render() {
     return (
-      <Login {...this.props} />
+      <SignUp {...this.props} />
     );
   }
 }
@@ -23,10 +23,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    loginUser: (usernameOrEmail, password) => {
-      dispatch(loginUser(usernameOrEmail, password));
+    signupUser: (email, password) => {
+      dispatch(signupUser(email, password));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(SignupContainer);
