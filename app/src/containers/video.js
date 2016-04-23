@@ -9,7 +9,7 @@ import ip from '../config';
 import { video, login } from '../assets/styles';
 import NavBar from '../components/navbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { FileUpload } from 'NativeModules';
 const {
   View,
   StyleSheet,
@@ -50,24 +50,68 @@ class WatchVideo extends Component {
   }
 
   _sendVideo() {
-    RNFS.readFile(this.props.currentQuilt.file, 'base64')
-      .then((data) => {
-        if (this.props.currentQuilt.status === 'create') {
-          this.props.postQuilt(Object.assign(this.props.currentQuilt, {
-            creator: this.props.creator,
-            video: data,
-            token: this.props.token,
-          }));
-        } else {
-          this.props.postToExistingQuilt({
-            quiltId: this.props.currentQuilt.id,
-            creator: this.props.creator,
-            video: data,
-            token: this.props.token,
-          });
-        }
-        this.props.navigator.replace({ name: 'home' });
-      });
+    fetch(`http://${ip}:8000/api/putVideo`, {
+      method: 'POST',
+      body: JSON.stringify({
+        id: 1,
+        userIds: [2,3,4,5],
+      }),
+    })
+    .then(res => res.text())
+    .then((url) => {
+      return RNFS.readFile(this.props.currentQuilt.file, 'base64')
+        .then((base64Video) => {
+          console.log(base64Video)
+          if (this.props.currentQuilt.status === 'create') {
+            fetch(url, {
+              body: base64Video,
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'base64',
+              }
+            })
+            // this.props.postQuilt(Object.assign(this.props.currentQuilt, {
+            //   creator: this.props.creator,
+            //   video: data,
+            //   token: this.props.token,
+            // }));
+          } else {
+            fetch(url, {
+              body: base64Video,
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'base64',
+              }
+            })
+            // this.props.postToExistingQuilt({
+            //   quiltId: this.props.currentQuilt.id,
+            //   creator: this.props.creator,
+            //   video: data,
+            //   token: this.props.token,
+            // });
+          }
+          this.props.navigator.replace({ name: 'home' });
+        });
+      // fetch(`http://${ip}:8000/api/test`, {
+      //   method: 'PUT',
+      //   body: 'test',
+      //   headers: {
+      //     'Content-Type': 'video/quicktime',
+      //   }
+      // })
+
+    })
+    // .then(url => {
+    //   const body = new FormData();
+    //   body.append('file', this.props.currentQuilt.file);
+    //   return fetch(url, {
+    //     method: 'PUT',
+    //     body,
+    //   })
+    //   .then(r => console.log('response', r))
+    //   .then(e => console.log('e', e))
+    // })
+
   }
 
   _replayVideo() {
@@ -75,7 +119,6 @@ class WatchVideo extends Component {
   }
 
   render() {
-
     let acceptText;
     let rejectText;
     let repeat = true;
