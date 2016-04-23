@@ -3,22 +3,60 @@ import controller from '../db/controllers/index';
 import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
+import { promisifyAll } from 'bluebird';
+
 import { writeVideoToDiskPipeline, getQuiltFromId } from './utils';
 import Authentication from '../db/controllers/authentication';
 import passportService from '../db/services/passport';
+
 import passport from 'passport';
 import phone from 'phone';
 import async from 'async';
+import AWS from 'aws-sdk';
+
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } from './config';
+AWS.config.accessKeyId = AWS_ACCESS_KEY_ID;
+AWS.config.secretAccessKey = AWS_SECRET_ACCESS_KEY;
+
+const s3 = new AWS.S3();
+promisifyAll(s3)
 
 const requireAuth = passport.authenticate('jwt', { session: false });
 
 export default (app) => {
-  // login
-  // 1) check if user exists
-    // if yes, verify password
-      // if correct, res.status(200).send('logged in!')
-      // if incorrect, res.status().send('incorrect password')
-    // if no, res.status().send('User does not exist')
+
+  app.put('/api/test', (req, res) => {
+    const writeStream = fs.createWriteStream('./testvideo.mov');
+    console.log(req.headers)
+    let body = '';
+    req.on('data', chunk => body += chunk)
+        .on('end', () => console.log(body))
+  })
+
+  app.post('/api/putVideo', (req, res) => {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      const { id, userIds } = JSON.parse(body);
+
+      controller.postQuilt(id, userIds)
+        .then(quiltId =>
+          s3.getSignedUrlAsync('putObject', {
+            Bucket: 'quiltmobileapp',
+            Key: `test.mov`,
+            ContentType: 'base64',
+          })
+        )
+        .then(url => res.header('Content-Type', 'text/plain').send(url))
+        .catch(e => console.log(e));
+    });
+  });
+
+
+
+
+
+
   app.get('/api/auth', (req, res) => {
     controller.verifyUser(req.query.usernameOrEmail, req.query.password)
       .then(user => {

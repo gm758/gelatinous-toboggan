@@ -1,11 +1,11 @@
 import passport from 'passport';
-import config from '../../config/config';
+import { AUTH_SECRET } from '../../config/config';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import controller from '../controllers/index';
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token'),
-  secretOrKey: config.secret,
+  secretOrKey: AUTH_SECRET,
 };
 
 const jwtLogin = new Strategy(jwtOptions, function(payload, done) {

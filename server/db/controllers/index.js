@@ -116,28 +116,24 @@ const addFriends = (userId, friendIds) => {
   }).catch(error => console.log(`Error adding friends: ${error}`));
 }
 
-const postQuilt = (options) => {
-  let newQuilt;
-  let createObj = Object.assign({}, _.pick(options, ['title', 'theme']), {status: 0});
-  return db.Quilt.create(createObj)
-    .then((quilt) => {
-      newQuilt = quilt;
-      return getUser({ username: options.creator.username });
-    })
-    .then(user => newQuilt.addUser(user, { status: 1 }))
-    .then(() => (
-      db.User.findAll({
-        where: {
-          id: {
-            $in: options.users,
-          },
-        },
-      })
-    ))
-    .then(users => newQuilt.addUsers(users, { status: 0 }))
-    .then(() => newQuilt.id)
-    .catch(error => console.error(`Error posting a quilt: ${error}`))
-};
+const postQuilt = (creatorId, userIds) =>
+  db.Quilt.create({ status: 0 })
+    .then(quilt =>
+      getUser({ id: creatorId })
+        .then(user => quilt.addUser(user, { status: 1 }))
+        .then(() => (
+          db.User.findAll({
+            where: {
+              id: {
+                $in: userIds,
+              },
+            },
+          })
+        ))
+      .then(users => quilt.addUsers(users, { status: 0 }))
+      .then(() => quilt.get('id'))
+      .catch(error => console.error(`Error posting a quilt: ${error}`))
+    );
 
 const updateUserQuiltStatus = (userId, quiltId) => {
   return getUser({ id: userId }).then((user) => {
