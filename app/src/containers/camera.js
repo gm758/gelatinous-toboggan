@@ -2,7 +2,7 @@
 import React from 'react-native';
 import Camera from 'react-native-camera';
 import { connect } from 'react-redux';
-import { reviewQuilt, selectWatchQuilt } from '../actions/index';
+import { reviewQuilt, selectWatchQuilt } from '../actions/quilts';
 import Button from '../components/button';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { camera } from '../assets/styles';

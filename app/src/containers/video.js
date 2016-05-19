@@ -13,6 +13,7 @@ import { FileUpload } from 'NativeModules';
 const {
   View,
   StyleSheet,
+  Text,
   PropTypes,
   TouchableHighlight,
 } = React;
@@ -22,6 +23,9 @@ class WatchVideo extends Component {
     super(props);
     this.onAccept = this.onAccept.bind(this);
     this.onReject = this.onReject.bind(this);
+    this.state = {
+      url: null,
+    };
 
     if (this.props.currentQuilt.status === 'watchAdd'
      || this.props.currentQuilt.status === 'watch') {
@@ -29,6 +33,12 @@ class WatchVideo extends Component {
     } else {
       this.url = this.props.currentQuilt.file;
     }
+  }
+
+  componentDidMount() {
+    fetch(`http://${ip}:8000/api/quilt/${this.props.currentQuilt.id}?token=${this.props.token}`)
+      .then(res => res.json())
+      .then(({ url }) => this.setState({ url }))
   }
 
   onAccept() {
@@ -49,69 +59,80 @@ class WatchVideo extends Component {
     }
   }
 
-  _sendVideo() {
-    fetch(`http://${ip}:8000/api/putVideo`, {
+  _readFile(filePath) {
+    // this.props.currentQuilt.file
+    return RNFS.readFile(filePath, 'base64')
+  }
+
+  _createQuilt(id, userIds) {
+    return fetch(`http://${ip}:8000/api/createQuilt`, {
       method: 'POST',
       body: JSON.stringify({
-        id: 1,
-        userIds: [2,3,4,5],
+        id: id,
+        userIds: userIds,
+      }),
+    });
+  }
+
+  _updateQuilt(userId, quiltId) {
+    return fetch(`http://${ip}:8000/api/updateQuilt/${quiltId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        userId,
       }),
     })
-    .then(res => res.text())
-    .then((url) => {
-      return RNFS.readFile(this.props.currentQuilt.file, 'base64')
-        .then((base64Video) => {
-          console.log(base64Video)
-          if (this.props.currentQuilt.status === 'create') {
-            fetch(url, {
-              body: base64Video,
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'base64',
-              }
-            })
-            // this.props.postQuilt(Object.assign(this.props.currentQuilt, {
-            //   creator: this.props.creator,
-            //   video: data,
-            //   token: this.props.token,
-            // }));
-          } else {
-            fetch(url, {
-              body: base64Video,
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'base64',
-              }
-            })
-            // this.props.postToExistingQuilt({
-            //   quiltId: this.props.currentQuilt.id,
-            //   creator: this.props.creator,
-            //   video: data,
-            //   token: this.props.token,
-            // });
-          }
-          this.props.navigator.replace({ name: 'home' });
-        });
-      // fetch(`http://${ip}:8000/api/test`, {
-      //   method: 'PUT',
-      //   body: 'test',
-      //   headers: {
-      //     'Content-Type': 'video/quicktime',
-      //   }
-      // })
+  }
 
-    })
-    // .then(url => {
-    //   const body = new FormData();
-    //   body.append('file', this.props.currentQuilt.file);
-    //   return fetch(url, {
-    //     method: 'PUT',
-    //     body,
-    //   })
-    //   .then(r => console.log('response', r))
-    //   .then(e => console.log('e', e))
-    // })
+  _sendToS3(presignedUrl, uri) {
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = (e) => {
+      if (xhr.readyState !== 4) {
+        return;
+      }
 
+      if (xhr.status === 200) {
+        console.log('success', xhr.responseText);
+      } else {
+        console.warn('error');
+        console.log(xhr)
+      }
+    };
+
+    xhr.open('PUT', presignedUrl);
+    xhr.send({ uri: uri, type: 'video/quicktime'});
+  }
+
+  _enqueueCreate(key) {
+    return fetch(`http://${ip}:8000/api/enqueueCreate`, {
+      method: 'POST',
+      body: key,
+    });
+  }
+
+  _enqueueUpdate(key) {
+    return fetch(`http://${ip}:8000/api/enqueueUpdate`, {
+      method: 'PUT',
+      body: key,
+    });
+  }
+
+  _sendVideo() {
+    if (this.props.currentQuilt.status === 'create') {
+      this._createQuilt(this.props.creator.id, this.props.currentQuilt.users.toArray())
+        .then(res => res.json())
+        .then(({url, key}) =>
+          this._sendToS3(url, this.props.currentQuilt.file)
+        )
+        .then(() => console.log('uploaded'));
+    } else {
+      this._updateQuilt(this.props.creator.id, this.props.currentQuilt.id)
+        .then(res => res.json())
+        .then(({ url, key }) => 
+          this._sendToS3(url, this.props.currentQuilt.file)
+        )
+        .then(s => console.log('uploaded subsequent', s))
+        .catch(e => console.log('error', e));
+    }
   }
 
   _replayVideo() {
@@ -123,32 +144,39 @@ class WatchVideo extends Component {
     let rejectText;
     let repeat = true;
     if (this.props.currentQuilt.status === 'watch') {
-      acceptButton = <Icon name="play" style={video.check} size={40} />;
-      rejectButton = <Icon name="undo" style={video.check} size={40} />;
+      acceptText = <Icon name="play" style={video.check} size={40} />;
+      rejectText = <Icon name="undo" style={video.check} size={40} />;
       repeat = false;
     } else if (this.props.currentQuilt.status === 'watchAdd') {
-      acceptText = 'Contribute';
-      rejectText = 'Back';
+      acceptText = <Text>'Contribute'</Text>;
+      rejectText = <Text>'Back'</Text>;
     } else {
-      acceptButton = <Icon name="check" style={video.check} size={40} />;
-      rejectButton = <Icon name="close" style={video.close} size={40} />;
+      acceptText = <Icon name="check" style={video.check} size={40} />;
+      rejectText = <Icon name="close" style={video.close} size={40} />;
     }
-    return (
-      <View style={video.container}>
+    let mainComponent = (<View style={video.backgroundVideo}></View>)
+    console.log(this.state.url);
+    if (this.state.url) {
+      mainComponent = (
         <Video
           ref="video"
-          source={{ uri: this.url }}
+          source={{ uri: this.state.url }}
           style={video.backgroundVideo}
           repeat={repeat}
           resizeMode="cover"
-        />
+        />)
+    }
+
+    return (
+      <View style={video.container}>
+        {mainComponent}
         <View style={login.containerHead}></View>
         <View style={video.buttonContainer}>
           <TouchableHighlight style={video.iconContainerA} onPress={this.onAccept}>
-            {acceptButton}
+            {acceptText}
           </TouchableHighlight>
           <TouchableHighlight style={video.iconContainerB} onPress={this.onReject}>
-            {rejectButton}
+            {rejectText}
           </TouchableHighlight>
         </View>
       </View>
