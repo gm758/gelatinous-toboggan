@@ -47,6 +47,7 @@ class ShowQuilts extends Component {
 
   getDataSource() {
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => !Immutable.is(r1, r2) });
+    console.log(this.props.quilts.get('quiltsList'))
     return ds.cloneWithRows(this.props.quilts.get('quiltsList').toArray());
   }
 

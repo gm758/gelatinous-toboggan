@@ -1,9 +1,15 @@
 import {
   REQUEST_QUILTS,
   RECEIVE_QUILTS,
+  REVIEW_QUILT,
   SELECT_WATCH_QUILT,
 } from '../constants/ActionTypes';
 import ip from '../config';
+
+export const reviewQuilt = (file) => ({
+  type: REVIEW_QUILT,
+  payload: file,
+});
 
 const requestQuilts = () => ({
   type: REQUEST_QUILTS,
