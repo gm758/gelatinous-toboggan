@@ -84,13 +84,15 @@ const updateQuiltStatusToReady = (id) => {
 
 // options = {username: username}
 const getAllUserQuilts = (user) =>
-  user.getQuilts({
+  user.getQuilts()
+  /*user.getQuilts({
     where: {
       status: {
         $gt: 0,
       },
     },
-  })
+  })*/
+  .then(x => { console.log(x); return x; })
   .then(mapQuilts)
   .catch(error => console.error(`Error retrieving user's quilts: ${error}`));
 

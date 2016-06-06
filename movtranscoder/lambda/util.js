@@ -50,8 +50,7 @@ function uploadMp4(filepath) {
   return uploadBody.pipe(uploadStream);
 }
 
-export default function downloadTranscodeUpload(req, res) {
-  const { key } = req.body;
+function downloadTranscodeUpload(key) {
   const movFilePath = '/tmp/tmp.mov';
   const mp4FilePath = '/tmp/tmp.mp4';
   const downloadStream = createDownloadStream(key);
