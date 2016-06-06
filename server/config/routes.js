@@ -19,42 +19,75 @@ AWS.config.accessKeyId = AWS_ACCESS_KEY_ID;
 AWS.config.secretAccessKey = AWS_SECRET_ACCESS_KEY;
 
 const s3 = new AWS.S3();
-promisifyAll(s3)
+promisifyAll(s3);
+
+const sqs = new AWS.SQS({
+  region: 'us-west-2',
+});
+promisifyAll(sqs);
 
 const requireAuth = passport.authenticate('jwt', { session: false });
 
 export default (app) => {
 
-  app.put('/api/test', (req, res) => {
-    const writeStream = fs.createWriteStream('./testvideo.mov');
-    console.log(req.headers)
-    let body = '';
-    req.on('data', chunk => body += chunk)
-        .on('end', () => console.log(body))
-  })
-
-  app.post('/api/putVideo', (req, res) => {
+  app.post('/api/createQuilt', (req, res) => {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       const { id, userIds } = JSON.parse(body);
-
       controller.postQuilt(id, userIds)
         .then(quiltId =>
           s3.getSignedUrlAsync('putObject', {
-            Bucket: 'quiltmobileapp',
-            Key: `test.mov`,
-            ContentType: 'base64',
+            Bucket: 'quiltmobileapp-oregon',
+            Key: `upload_initial/quilt_${quiltId}.mov`,
+            ContentType: 'video/quicktime',
           })
+          .then(url => res.header('Content-Type', 'application/json').send({
+            url,
+            key: `quilt_${quiltId}.mov`
+          }))
         )
-        .then(url => res.header('Content-Type', 'text/plain').send(url))
         .catch(e => console.log(e));
     });
   });
 
+  app.put('/api/updateQuilt/:quiltId', (req, res) => {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      const { userId } = JSON.parse(body);
+      const quiltId = req.params.quiltId;
+      controller.updateUserQuiltStatus(userId, quiltId)
+        .then(quiltId =>
+          s3.getSignedUrlAsync('putObject', {
+            Bucket: 'quiltmobileapp-oregon',
+            Key: `upload_next/quilt_${quiltId}/user_${userId}.mov`,
+            ContentType: 'video/quicktime',
+          })
+          .then(url => res.header('Content-Type', 'application/json').send({
+            url,
+            key: `quilt_${quiltId}.mov`
+          }))
+        )
+        .catch(e => console.log(e));
+    });
+  });
 
+  app.post('/api/enqueueCreate', (req, res) => {
+    sqs.sendMessageAsync({
+      MessageBody: 'test',
+      QueueUrl: 'https://sqs.us-west-1.amazonaws.com/434341646041/creationQueue',
+    })
+    .then((data) => {
+      console.log(data);
+      res.sendStatus(201);
+    })
+    .catch((error) => {
+      console.log(error);
 
-
+      res.sendStatus(404)
+    });
+  });
 
 
   app.get('/api/auth', (req, res) => {
@@ -104,6 +137,7 @@ export default (app) => {
 
   app.get('/api/quilt', requireAuth, (req, res) => {
     const user = req.user;
+    console.log(user)
     // if request query object is empty, send 404
     if (_.isEmpty(req.query)) {
       res.status(400).send('Failed to retrieve query string');
@@ -147,7 +181,13 @@ export default (app) => {
   // note: due to limitations of react-native-video, this route
   // expects the authentication token in the querystring
   app.get('/api/quilt/:id', requireAuth, (req, res) => {
-    res.sendFile(getQuiltFromId(req.params.id));
+    // res.sendFile(getQuiltFromId(req.params.id));
+    const params = {Bucket: 'quiltmobileapp-oregon', Key: `quilts/quilt_${req.params.id}.mp4`};
+    s3.getSignedUrlAsync('getObject', params)
+      .then(url => {
+        console.log(url)
+        res.status(200).json({ url })
+      })
   });
 
   app.post('/api/quilt/:id', requireAuth, (req, res) => {
@@ -179,20 +219,21 @@ export default (app) => {
     })
   });
 
-  // app.get('/api/users', requireAuth, (req, res) => {
-  //   const username = req.query.username;
-  //   controller.getUser({ username })
-  //   .then(user => {
-  //     if (user) {
-  //       res.status(200).send({
-  //         id: user.get('id'),
-  //         username: user.get('username'),
-  //       });
-  //     } else {
-  //       res.sendStatus(400);
-  //     }
-  //   });
-  // })
+  app.get('/api/users', requireAuth, (req, res) => {
+   const username = req.query.username;
+   console.log(username)
+   controller.getUser({ username })
+     .then(user => {
+       if (user) {
+         res.status(200).send({
+           id: user.get('id'),
+           username: user.get('username'),
+         });
+       } else {
+         res.sendStatus(400);
+       }
+    });
+  })
 
   app.get('/api/user/:username', (req, res) => {
     if (_.isEmpty(req.params.username)) {

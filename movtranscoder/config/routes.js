@@ -1,10 +1,4 @@
-import request from 'request';
+import downloadTranscodeUpload from './util'
 export default (app) => {
-
-  app.put('/api/movToMp4', (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk)
-        .on('end', () => {
-
-        })
-  })
+  app.put('/api/movToMp4', (req, res) => downloadTranscodeUpload(req, res))
+}
