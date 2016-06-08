@@ -48,27 +48,29 @@ const EmptyQueueError = 'EmptyQueue';
       throw workflowError(EmptyQueueError, new Error('No messages'));
     }
 
-    const message = JSON.parse(data.Messages[0].Body);
-    
-
-    console.log('Deleting:', data.Messages[0].MessageId);
-
-    return deleteMessage({
-      ReceiptHandle: data.Messages[0].ReceiptHandle,
-    });
+    const { target, newFile } = JSON.parse(data.Messages[0].Body);
+    return downloadConcat(newFile, target)
+      .then(() => {
+        console.log('Deleting:', data.Messages[0].MessageId);
+        return deleteMessage({
+          ReceiptHandle: data.Messages[0].ReceiptHandle,
+        })
+      })
   })
-  .then(_ => console.log('Message Deleted Successfully'))
+  .then(() => console.log('Message Deleted Successfully'))
   .catch((error) => {
     if (error.type === EmptyQueueError) {
-      console.log('ExpectedError:', error.message);
+      console.log('ExpectedError:', error.message)
     } else {
-      console.log('Unexpected Error:', error.message);
+      console.log('Unexpected Error:', error.message)
     }
   })
-  .finally(pollQueueForMessages);
-})();
+  .finally(pollQueueForMessages)
+
+})()
 
 function workflowError(type, error) {
   error.type = type;
   return error;
 }
+
