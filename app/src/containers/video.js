@@ -41,6 +41,7 @@ class WatchVideo extends Component {
   onAccept() {
     if (this.props.currentQuilt.status === 'add' || this.props.currentQuilt.status === 'create') {
       this._sendVideo();
+      this.props.navigator.replace({ name: 'home' })
     } else if (this.props.currentQuilt.status === 'watchAdd') {
       this.props.navigator.replace({ name: 'camera' });
     } else {
