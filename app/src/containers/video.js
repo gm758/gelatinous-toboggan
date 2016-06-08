@@ -24,18 +24,29 @@ class WatchVideo extends Component {
     this.onAccept = this.onAccept.bind(this);
     this.onReject = this.onReject.bind(this);
 
+    this.state = {
+      url: null,
+    };
+    /*
     if (this.props.currentQuilt.status === 'watchAdd'
      || this.props.currentQuilt.status === 'watch') {
       this.url = `http://${ip}:8000/api/quilt/${this.props.currentQuilt.id}?token=${this.props.token}`;
     } else {
       this.url = this.props.currentQuilt.file;
     }
+    */
   }
 
   componentDidMount() {
-    fetch(`http://${ip}:8000/api/quilt/${this.props.currentQuilt.id}?token=${this.props.token}`)
-      .then(res => res.json())
-      .then(({ url }) => this.setState({ url }))
+    if (this.props.currentQuilt.status === 'watchAdd' ||
+        this.props.currentQuilt.status === 'watch') {
+
+      fetch(`http://${ip}:8000/api/quilt/${this.props.currentQuilt.id}?token=${this.props.token}`)
+        .then(res => res.json())
+        .then(({ url }) => this.setState({ url }));
+    } else {
+      this.setState({ url: this.props.currentQuilt.file });
+    }
   }
 
   onAccept() {
@@ -100,20 +111,6 @@ class WatchVideo extends Component {
     xhr.send({ uri: uri, type: 'video/quicktime'});
   }
 
-  _enqueueCreate(key) {
-    return fetch(`http://${ip}:8000/api/enqueueCreate`, {
-      method: 'POST',
-      body: key,
-    });
-  }
-
-  _enqueueUpdate(key) {
-    return fetch(`http://${ip}:8000/api/enqueueUpdate`, {
-      method: 'PUT',
-      body: key,
-    });
-  }
-
   _sendVideo() {
     if (this.props.currentQuilt.status === 'create') {
       this._createQuilt(this.props.creator.id, this.props.currentQuilt.users.toArray())
@@ -154,11 +151,11 @@ class WatchVideo extends Component {
     }
     let mainComponent = (<View style={video.backgroundVideo}></View>)
 
-    if (this.url) {
+    if (this.state.url) {
       mainComponent = (
         <Video
           ref="video"
-          source={{ uri: this.url }}
+          source={{ uri: this.state.url }}
           style={video.backgroundVideo}
           repeat={repeat}
           resizeMode="cover"
