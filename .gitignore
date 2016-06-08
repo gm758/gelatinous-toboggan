@@ -33,3 +33,6 @@ node_modules/
 
 # Database
 server/db/quilt.sqlite
+
+#vim
+*.swp
