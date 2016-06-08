@@ -73,6 +73,7 @@ class ShowCamera extends Component {
   reverseCamera() {
     this.setState({ type: this.state.type === 'back' ? 'front' : 'back' });
   }
+
   render() {
     return (
       <Camera
