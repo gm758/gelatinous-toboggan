@@ -23,9 +23,6 @@ class WatchVideo extends Component {
     super(props);
     this.onAccept = this.onAccept.bind(this);
     this.onReject = this.onReject.bind(this);
-    this.state = {
-      url: null,
-    };
 
     if (this.props.currentQuilt.status === 'watchAdd'
      || this.props.currentQuilt.status === 'watch') {
@@ -155,12 +152,12 @@ class WatchVideo extends Component {
       rejectText = <Icon name="close" style={video.close} size={40} />;
     }
     let mainComponent = (<View style={video.backgroundVideo}></View>)
-    console.log(this.state.url);
-    if (this.state.url) {
+
+    if (this.url) {
       mainComponent = (
         <Video
           ref="video"
-          source={{ uri: this.state.url }}
+          source={{ uri: this.url }}
           style={video.backgroundVideo}
           repeat={repeat}
           resizeMode="cover"
