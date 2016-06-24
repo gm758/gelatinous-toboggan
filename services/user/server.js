@@ -4,6 +4,9 @@ const {
   addFriends, 
   getFriends,
 } = require('./db')
+
+const { JWT_SECRET } = require('./config')
+
 const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
@@ -12,6 +15,18 @@ const app = express()
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.use(jwt({
+  secret: JWT_SECRET,
+  credentialsRequired: true,
+  getToken: function fromHeader(req) {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      return req.headers.authorization.split(' ')[1];
+    }
+    return null;
+  }
+}).unless({path: ['/api/auth', '/api/login']})
+
 
 // routes
 
@@ -31,7 +46,7 @@ app.post('/api/auth', (req, res) => {
       }
     })
     .catch(() => res.sendStatus(500))
-});
+})
 
 // login
 app.get('/api/auth', (req, res) => {
@@ -50,18 +65,27 @@ app.get('/api/auth', (req, res) => {
     .catch(() => res.sendStatus(500))
 })
 
-// update user by id
-app.put('/api/user/:id', (req, res) => {
+// update user
+app.put('/api/user', (req, res) => {
+  const userId = req.user.id
+})
 
-});
+// get friends
+app.get('/api/friends', (req, res) => {
+  const userId = req.user.id
+  getFriends(userId)
+    .then((friends) => {
+      res.status(200).send(friends)
+    })
+    .catch(() => res.sendStatus(500))
+})
 
-// get friends by id
-app.get('/api/friends/:id', (req, res) => {
-
-});
-
-// create friends by id
-app.post('/api/friends/:id', (req, res) => {
-
+// add friends
+app.post('/api/friends', (req, res) => {
+  const userId = req.user.id
+  const friendIds = req.body.friends
+  addFriends(userId, friendIds)
+    .then(() => res.sendStatus(201))
+    .catch(() => res.sendStatus(500))
 })
 
