@@ -1,5 +1,11 @@
 const test = require('tape')
-const { db, createUser, authenticateUser, addFriends } = require('./db')
+const {
+  db,
+  createUser,
+  authenticateUser,
+  addFriends,
+  getFriends
+} = require('./db')
 
 const before = test
 
@@ -35,30 +41,24 @@ test('create and authenticate users', (t) => {
 })
 
 test('add and query friendships', (t) => {
-  const users = [
-    'griffin@griffin.com',
-    'grant@grant.com',
-    'kendall@kendall.com',
-    'kristin@kristin.com'
-  ]
+  t.plan(4)
+  const user1 = 'griffin@griffin.com'
+  const user2 = 'grant@grant.com'
 
-  Promise.all(users.map(email => createUser(email, 'password')))
-    .then((data) => {
-      const createdIds = data.map(datum => datum._id)
-      addFriends(createdIds[0], createdIds.slice(1))
-        .then(() => {
-          getFriends(createdIds[0])
-            .then(friends => {
-              const friendIds = friends.map(friend => friend._id)
-              createdIds.slice(1).forEach((id) => {
-                t.ok(friendIds.contains(id))
-              })
-              t.end()
-            })
+  createUser(user1, 'password')
+    .then((u1) => {
+      const id1 = u1.id
+      createUser(user2, 'password')
+        .then((u2) => {
+          const id2 = u2.id
+          getFriends(id1).then(friends => t.deepEqual(friends, []))
+          getFriends(id2).then(friends => t.deepEqual(friends, []))
+
+          addFriends(id1, [id2]).then(() => {
+            getFriends(id1).then(friends => t.deepEqual(friends, [id2]))
+            getFriends(id2).then(friends => t.deepEqual(friends, [id1]))
+          })
         })
     })
 })
-
-
-
 
