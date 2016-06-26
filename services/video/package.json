@@ -1,23 +1,20 @@
 {
   "name": "user",
   "version": "0.1.0",
-  "description": "Quilt authentication service",
+  "description": "Quilt video service",
   "main": "index.js",
   "scripts": {
     "test": "node test.js"
   },
   "author": "",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
-    "async": "^2.0.0-rc.6",
-    "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "express-jwt": "^3.4.0",
     "jwt-simple": "^0.5.0",
     "morgan": "^1.7.0",
-    "neo4j": "^2.0.0-RC2",
-    "nodemon": "^1.9.2"
+    "nodemon": "^1.9.2",
   },
   "devDependencies": {
     "supertest": "^1.2.0",
