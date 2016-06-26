@@ -14,7 +14,8 @@
     "express-jwt": "^3.4.0",
     "jwt-simple": "^0.5.0",
     "morgan": "^1.7.0",
-    "nodemon": "^1.9.2",
+    "mysql": "^2.11.1",
+    "nodemon": "^1.9.2"
   },
   "devDependencies": {
     "supertest": "^1.2.0",
