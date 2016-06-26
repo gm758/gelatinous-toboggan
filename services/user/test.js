@@ -1,5 +1,6 @@
 const test = require('tape')
-const supertest = require('supertest') // TODO!
+const app = require('./server')
+const request = require('supertest')(app)
 
 const {
   db,
@@ -8,6 +9,7 @@ const {
   addFriends,
   getFriends
 } = require('./db')
+
 
 const before = test
 
@@ -62,5 +64,38 @@ test('add and query friendships', (t) => {
           })
         })
     })
+})
+
+test('signup and login routes', (t) => {
+  function createUser() {
+    request
+      .post('/user/signup')
+      .send(userSignup)
+      .expect(201, loginUser)
+  }
+
+  function loginUser(err) {
+    t.error(err, 'No error')
+    request
+      .post('/user/login')
+      .send(userLogin)
+      .expect(201)
+      .end((err, res) => {
+        t.error(err, 'No error')
+        t.end()
+      })
+  }
+
+  const userSignup = {
+    email: 'kendall@kendall.com',
+    password: 'password',
+  }
+
+  const userLogin = {
+    usernameOrEmail: 'kendall@kendall.com',
+    password: 'password',
+  }
+
+  createUser()
 })
 

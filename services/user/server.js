@@ -5,9 +5,14 @@ const {
   getFriends,
 } = require('./db')
 
+const { tokenFromId } = require('./jwt')
+
 const { JWT_SECRET } = require('./config')
 
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const jwt = require('express-jwt')
+
 const express = require('express')
 const app = express()
 
@@ -25,21 +30,21 @@ app.use(jwt({
     }
     return null;
   }
-}).unless({path: ['/api/auth', '/api/login']})
+}).unless({path: ['/user/signup', '/user/login']}))
 
 
 // routes
 
 // signup
-app.post('/api/auth', (req, res) => {
+app.post('/user/signup', (req, res) => {
   const { email, password } = req.body
   createUser(email, password)
     .then((user) => {
       if (user) {
         res.status(201)
-           .send({
+           .json({
              id: user.id,
-             token: tokenForUser(user.id),
+             token: tokenFromId(user.id),
            })
       } else {
         res.sendStatus(406)
@@ -49,14 +54,14 @@ app.post('/api/auth', (req, res) => {
 })
 
 // login
-app.get('/api/auth', (req, res) => {
+app.post('/user/login', (req, res) => {
   const { usernameOrEmail, password } = req.body
   authenticateUser(usernameOrEmail, password)
     .then((user) => {
       if (user) {
-        res.status(201).send({
+        res.status(201).json({
           id: user.id,
-          token: tokenForUser(user.id),
+          token: tokenFromId(user.id),
         })
       } else {
         res.sendStatus(400)
@@ -66,12 +71,12 @@ app.get('/api/auth', (req, res) => {
 })
 
 // update user
-app.put('/api/user', (req, res) => {
+app.put('/user/update', (req, res) => {
   const userId = req.user.id
 })
 
 // get friends
-app.get('/api/friends', (req, res) => {
+app.get('/user/friends', (req, res) => {
   const userId = req.user.id
   getFriends(userId)
     .then((friends) => {
@@ -81,7 +86,7 @@ app.get('/api/friends', (req, res) => {
 })
 
 // add friends
-app.post('/api/friends', (req, res) => {
+app.post('/user/friends', (req, res) => {
   const userId = req.user.id
   const friendIds = req.body.friends
   addFriends(userId, friendIds)
@@ -89,3 +94,4 @@ app.post('/api/friends', (req, res) => {
     .catch(() => res.sendStatus(500))
 })
 
+module.exports = app
