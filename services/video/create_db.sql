@@ -19,4 +19,3 @@ CREATE TABLE users_videos (
   FOREIGN KEY (video_id) REFERENCES videos(id)
 );
 
-
